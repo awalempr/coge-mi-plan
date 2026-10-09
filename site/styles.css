@@ -117,26 +117,34 @@ main { flex: 1; padding: 24px; max-width: 1240px; width: 100%; margin: 0 auto; }
 .view { display: grid; gap: 24px; animation: viewIn .35s var(--spring); }
 .view[hidden] { display: none; }
 @keyframes viewIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-#view-patient { grid-template-columns: 390px 1fr; align-items: start; gap: 40px; }
+#view-patient { grid-template-columns: 428px 1fr; align-items: start; gap: 40px; }
 .panel { background: var(--surface); border-radius: var(--r-lg); padding: 24px; box-shadow: var(--shadow); }
 .panel.wide { display: grid; gap: 22px; padding: 28px; }
 .side { display: grid; gap: 20px; position: sticky; top: 76px; }
 .label { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--label-3); margin: 18px 0 8px; font-weight: 600; }
 
-/* ---------- iPhone ---------- */
-.phone {
-  position: relative;
-  background: var(--surface);
-  border: 11px solid #1d1d1f;
-  border-radius: 56px;
-  overflow: hidden;
-  height: 780px;
-  display: flex; flex-direction: column;
-  box-shadow: var(--shadow-lg), inset 0 0 0 1px #3a3a3c;
+/* ---------- iPhone 14 Pro (proportions from devices.css, MIT) ---------- */
+.iphone-wrap { display: flex; justify-content: center; }
+.iphone { position: relative; width: 428px; height: 868px; flex: none; transform-origin: top center; filter: drop-shadow(0 40px 50px rgba(0,0,0,.18)) drop-shadow(0 8px 14px rgba(0,0,0,.12)); }
+.iphone-frame {
+  position: absolute; inset: 0; padding: 19px; border-radius: 68px;
+  background: #010101; border: 1px solid #5c5956;
+  box-shadow: inset 0 0 4px 2px #e2dfdc, inset 0 0 0 6px #76726f;
 }
-.island { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 112px; height: 32px; background: #000; border-radius: 20px; z-index: 3; }
+.hw { position: absolute; width: 3px; background: #6b6763; border-radius: 2px; }
+.hw-action { left: -2px; top: 115px; height: 32px; }
+.hw-volup { left: -2px; top: 175px; height: 62px; }
+.hw-voldown { left: -2px; top: 255px; height: 62px; }
+.hw-power { right: -2px; top: 200px; height: 100px; }
+.island { position: absolute; top: 30px; left: 50%; width: 122px; height: 36px; margin-left: -61px; background: #000; border-radius: 20px; z-index: 5; }
+.island i { position: absolute; right: 13px; top: 13px; width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(farthest-corner at 25% 25%, #6074bf 0, transparent 45%), radial-gradient(farthest-corner at 75% 75%, #513785 0, #24555e 25%, #0b0b10 60%); }
+.screen { position: relative; width: 390px; height: 830px; border-radius: 49px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column; }
+.statusbar { height: 54px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 6px 30px 0 44px; font-weight: 600; font-size: 16px; letter-spacing: -0.02em; color: var(--label); background: var(--chrome); }
+.statusbar .sb-icons { display: flex; gap: 6px; align-items: center; }
+.statusbar svg { fill: currentColor; color: var(--label); }
+.home-ind { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: var(--label); z-index: 4; }
 .phone-head {
-  padding: 52px 16px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 2px 16px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 3px;
   background: var(--chrome); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border-bottom: 0.5px solid var(--separator);
 }
@@ -194,7 +202,7 @@ main { flex: 1; padding: 24px; max-width: 1240px; width: 100%; margin: 0 auto; }
 .suggest { display: flex; gap: 6px; overflow-x: auto; padding: 4px 12px 8px; scrollbar-width: none; }
 .suggest::-webkit-scrollbar { display: none; }
 .sugg { flex: none; border: 0.5px solid var(--separator); background: var(--surface); color: var(--label-2); border-radius: 999px; padding: 7px 12px; font-size: 12.5px; }
-.composer { display: flex; gap: 8px; align-items: center; padding: 8px 12px 26px; border-top: 0.5px solid var(--separator); background: var(--chrome); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+.composer { display: flex; gap: 8px; align-items: center; padding: 8px 12px 30px; border-top: 0.5px solid var(--separator); background: var(--chrome); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
 .composer input { flex: 1; min-width: 0; border: 0.5px solid var(--separator); background: var(--surface); color: var(--label); border-radius: 999px; padding: 9px 14px; font: inherit; font-size: 15px; outline: none; }
 .composer input::placeholder { color: var(--label-3); }
 .mic, .send { width: 36px; height: 36px; flex: none; border: 0; border-radius: 50%; display: grid; place-items: center; }
@@ -292,15 +300,11 @@ body.big main, body.big .hero { zoom: 1.18; }
   .tab { flex: 1; padding: 7px 10px; }
   #view-patient, .vgrid, .igrid { grid-template-columns: 1fr; }
   .side { position: static; }
-  .phone { height: 700px; max-width: 420px; width: 100%; margin: 0 auto; }
 }
 @media (max-width: 560px) {
   main, .top-inner, .hero { padding-left: 16px; padding-right: 16px; }
   .hero h1 { font-size: 36px; }
   .hero p { font-size: 17px; }
-  .phone { border: 0; border-radius: 0; height: 74vh; box-shadow: none; margin: 0 -16px; width: calc(100% + 32px); max-width: none; }
-  .island { display: none; }
-  .phone-head { padding-top: 12px; }
   .frow { grid-template-columns: 120px 1fr 34px; gap: 8px; font-size: 13px; }
   .demobtn span { display: none; }
   .demobtn { padding: 0 10px; }
@@ -312,8 +316,18 @@ body.big main, body.big .hero { zoom: 1.18; }
 @media (max-width: 560px) {
   .hero { display: none; }
   main { padding-top: 0; }
-  .phone { height: calc(100svh - 112px); }
 }
 
 .engine { font-size: 12px; color: var(--label-3); align-self: center; margin-left: 4px; }
 .urgent { color: var(--red); font-weight: 600; }
+
+/* On phones the app IS the phone: drop the device frame and fill the screen. */
+@media (max-width: 560px) {
+  .iphone-wrap { margin: 0 -16px; }
+  .iphone { width: 100%; height: calc(100svh - 112px); filter: none; transform: none !important; }
+  .iphone-frame { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+  .screen { width: 100%; height: 100%; border-radius: 0; }
+  .hw, .island, .statusbar, .home-ind { display: none; }
+  .phone-head { padding-top: 10px; }
+  .composer { padding-bottom: 12px; }
+}

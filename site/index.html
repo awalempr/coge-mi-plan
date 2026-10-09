@@ -17,7 +17,7 @@
     <div class="top-inner">
       <div class="brand">
         <div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <span class="brand-name">Coge Mi Plan</span>
+        <span class="brand-name" data-t="brandShort">Coge Mi Plan</span>
       </div>
       <nav class="seg" role="tablist">
         <button class="tab on" data-tab="patient" role="tab"><span data-t="tabPatient"></span></button>
@@ -34,28 +34,42 @@
   </header>
 
   <section class="hero">
-    <h1>¿Coge Mi Plan?</h1>
+    <h1 data-t="brand">¿Coge Mi Plan?</h1>
     <p data-t="tagline"></p>
   </section>
 
   <main>
     <!-- 1. Patient -->
     <section id="view-patient" class="view">
-      <div class="phone">
-        <div class="island" aria-hidden="true"></div>
-        <div class="phone-head">
-          <div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <b data-t="chatTitle"></b>
-          <div class="small" data-t="chatSub"></div>
+      <div class="iphone-wrap"><div class="iphone" aria-label="iPhone preview">
+        <span class="hw hw-action"></span><span class="hw hw-volup"></span><span class="hw hw-voldown"></span><span class="hw hw-power"></span>
+        <div class="iphone-frame">
+          <div class="screen">
+            <div class="statusbar" aria-hidden="true">
+              <span class="sb-time">9:41</span>
+              <span class="sb-icons">
+                <svg viewBox="0 0 18 12" width="18" height="12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+                <svg viewBox="0 0 16 12" width="16" height="12"><path d="M8 11.5 10.4 9a3.4 3.4 0 0 0-4.8 0L8 11.5Zm-4.3-4.4 1.3 1.3a4.3 4.3 0 0 1 6 0l1.3-1.3a6.1 6.1 0 0 0-8.6 0ZM1 4.4l1.3 1.3a8 8 0 0 1 11.4 0L15 4.4a9.9 9.9 0 0 0-14 0Z"/></svg>
+                <svg viewBox="0 0 27 13" width="27" height="13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2.5"/><path d="M25 4.5v4a2 2 0 0 0 0-4Z" opacity=".45"/></svg>
+              </span>
+            </div>
+            <div class="phone-head">
+              <div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <b data-t="chatTitle"></b>
+              <div class="small" data-t="chatSub"></div>
+            </div>
+            <div id="chat" class="chat"></div>
+            <div id="suggest" class="suggest"></div>
+            <form id="composer" class="composer">
+              <button type="button" id="mic" class="mic" aria-label="Voice note"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+              <input id="msg" autocomplete="off" />
+              <button type="submit" class="send" aria-label="Send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </form>
+            <div class="home-ind" aria-hidden="true"></div>
+          </div>
         </div>
-        <div id="chat" class="chat"></div>
-        <div id="suggest" class="suggest"></div>
-        <form id="composer" class="composer">
-          <button type="button" id="mic" class="mic" aria-label="Voice note"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-          <input id="msg" autocomplete="off" />
-          <button type="submit" class="send" aria-label="Send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </form>
-      </div>
+        <div class="island" aria-hidden="true"><i></i></div>
+      </div></div>
 
       <div class="side">
         <div class="panel">

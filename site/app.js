@@ -15,6 +15,8 @@ const T = {
     tagline: "El registro central y verificado de quién acepta qué plan en Puerto Rico.",
     tabPatient: "Paciente", tabPharmacy: "Farmacia", tabVerify: "Verificación", tabImpact: "Impacto",
     phTitle: "Modo farmacia", phSub: "En el mostrador, el cliente pregunta: “¿quién coge mi plan?”. El farmacéutico responde en segundos y le envía la lista al paciente. Si un médico rechazó al paciente, se reporta con un toque.", phSpec: "Especialidad", phPlan: "Plan", phTown: "Pueblo", phSearch: "Buscar", phCopy: "Copiar lista para WhatsApp del paciente", phCopied: "¡Copiado!", phReport: "Rechazó al paciente", phReported: "Reportado ✓", phNone: "Ningún especialista confirmado en 45 km. Este dato alimenta el mapa de desiertos.", phStatus: "Estado",
+    brand: "¿Coge Mi Plan?", brandShort: "Coge Mi Plan", docTitle: "Coge Mi Plan · ¿Quién de verdad acepta tu plan médico?", tel: "Tel.",
+    regions: { Metro: "Metro", Este: "Este", Norte: "Norte", Oeste: "Oeste", Sur: "Sur" },
     chatTitle: "Coge Mi Plan", chatSub: "Asistente · responde en segundos",
     placeholder: "Ej: dermatólogo que coja Plan Vital en Caguas",
     send: "Enviar",
@@ -40,7 +42,9 @@ const T = {
     tagline: "Puerto Rico's central, verified registry of who accepts which plan.",
     tabPatient: "Patient", tabPharmacy: "Pharmacy", tabVerify: "Verification", tabImpact: "Impact",
     phTitle: "Pharmacy mode", phSub: "At the counter, the customer asks: “who takes my plan?”. The pharmacist answers in seconds and sends the list to the patient. If a doctor turned the patient away, it is reported with one tap.", phSpec: "Specialty", phPlan: "Plan", phTown: "Town", phSearch: "Search", phCopy: "Copy list for patient's WhatsApp", phCopied: "Copied!", phReport: "Turned patient away", phReported: "Reported ✓", phNone: "No confirmed specialist within 45 km. This feeds the desert map.", phStatus: "Status",
-    chatTitle: "Coge Mi Plan", chatSub: "Assistant · replies in seconds",
+    brand: "Takes My Plan?", brandShort: "Takes My Plan", docTitle: "Takes My Plan · Who actually accepts your health plan?", tel: "Phone",
+    regions: { Metro: "Metro", Este: "East", Norte: "North", Oeste: "West", Sur: "South" },
+    chatTitle: "Takes My Plan", chatSub: "Assistant · replies in seconds",
     placeholder: "e.g. dermatologist that takes Plan Vital in Caguas",
     send: "Send",
     behind: "Behind the scenes", understood: "Understood", funnel: "Directory vs. reality",
@@ -99,7 +103,7 @@ function card(x, planId, kind) {
     ? `<button class="pill dial" data-dial="${p.id}">📞 ${state.lang === "es" ? "Llamar" : "Call"}</button> <button class="link" data-report="${p.id}">${t("reportWrong")}</button>`
     : `<button class="pill" data-call="${p.id}">📞 ${t("callForMe")}</button>`;
   return `<div class="card" id="card-${p.id}">
-    <div class="card-top"><b>${p.name}</b><span class="dist">${Math.round(d)} km</span></div>
+    <div class="card-top"><b>${nm(p)}</b><span class="dist">${Math.round(d)} km</span></div>
     <div class="muted">${spec(p.specialty)[state.lang]} · ${town(p.town).name} · ${p.phone}</div>
     ${badge}
     ${kind === "confirmed" ? `<div class="muted small">${t("nextAppt")}: <b>${fmtDate(p.nextDays)}</b>${p.telehealth ? ` · ${t("tele")}` : ""}</div>` : ""}
@@ -169,8 +173,8 @@ function chatAction(act) {
     ? `🔔 Listo. Te escribo por aquí cuando un ${sp.doc.es} cerca de ${tw.name} confirme ${pl.name} o se abra una cita más temprano. Solo guardo tu número para este aviso; escribe <b>BORRAR</b> y lo elimino.`
     : `🔔 Done. I'll message you here when a ${sp.doc.en} near ${tw.name} confirms ${pl.name} or an earlier opening appears. I only keep your number for this alert; reply <b>DELETE</b> and it's gone.`);
   if (act === "family") {
-    const list = r.confirmed.slice(0, 3).map(({ p }) => `• ${p.name} — ${p.phone} (${town(p.town).name})`).join("\n");
-    navigator.clipboard?.writeText(`${sp[state.lang]} · ${pl.name}\n${list || "—"}\n— Coge Mi Plan`).catch(() => {});
+    const list = r.confirmed.slice(0, 3).map(({ p }) => `• ${nm(p)} — ${p.phone} (${town(p.town).name})`).join("\n");
+    navigator.clipboard?.writeText(`${sp[state.lang]} · ${pl.name}\n${list || "—"}\n— ${t("brandShort")}`).catch(() => {});
     return addMsg("bot", L ? "👪 Copié la lista para que se la envíes a tu hijo, hija o cuidador. Ellos también pueden escribirme y buscar por ti." : "👪 Copied the list so you can send it to your son, daughter or caregiver. They can also message me and search on your behalf.");
   }
 }
@@ -181,7 +185,7 @@ function missingPrompt(q) {
   if (!q.specialty) return (L ? "¿Qué especialista necesitas? Toca uno o dímelo con tus palabras." : "Which specialist do you need? Tap one or say it in your own words.")
     + quick(["derm", "cardio", "endo", "psiq", "neuro", "oftal", "reuma", "uro"].map((id) => cap(spec(id).doc[state.lang])));
   if (!q.plan) return (L ? "¿Qué plan médico tienes? Está en tu tarjeta del plan." : "Which health plan do you have? It's on your plan card.")
-    + quick(PLANS.map((p) => p.name));
+    + quick(PLANS.map((p) => nm(p)));
   return (L ? "¿En qué pueblo te queda bien ir?" : "Which town works for you?")
     + quick(["San Juan", "Bayamón", "Carolina", "Caguas", "Arecibo", "Mayagüez", "Ponce", "Yauco", "Humacao"]);
 }
@@ -287,8 +291,8 @@ function callScript(p, planId) {
   const agent = (es, en) => ["agent", state.lang === "es" ? es : en];
   const office = (es, en) => ["office", state.lang === "es" ? es : en];
   const lines = [
-    agent(`Buenas, le habla el asistente automatizado de Coge Mi Plan, verificando el directorio de planes médicos. ¿${p.name} está aceptando pacientes nuevos con ${pl}?`,
-      `Hi, this is the Coge Mi Plan automated assistant verifying health-plan directories. Is ${p.name} accepting new patients with ${pl}?`),
+    agent(`Buenas, le habla el asistente automatizado de Coge Mi Plan, verificando el directorio de planes médicos. ¿${nm(p)} está aceptando pacientes nuevos con ${pl}?`,
+      `Hi, this is the Takes My Plan automated assistant verifying health-plan directories. Is ${nm(p)} accepting new patients with ${pl}?`),
   ];
   if (ok) {
     lines.push(office(`Sí, con ${pl} sí. La próxima cita disponible sería el ${fmtDate(p.nextDays)}.`, `Yes, we take ${pl}. The next opening is ${fmtDate(p.nextDays)}.`));
@@ -306,11 +310,11 @@ function callScript(p, planId) {
 async function runCall(p, planId, { fast = false, log = $("#calllog") } = {}) {
   const { lines, ok } = callScript(p, planId);
   if (!fast) log.innerHTML = "";
-  const head = el(`<div class="call-head">📞 ${p.name} · ${p.phone} · ${plan(planId).name}</div>`);
+  const head = el(`<div class="call-head">📞 ${nm(p)} · ${p.phone} · ${plan(planId).name}</div>`);
   log.appendChild(head);
   if (!fast) {
     for (const [who, text] of lines) {
-      const ln = el(`<div class="cl ${who}"><span>${who === "agent" ? "IA" : state.lang === "es" ? "Consultorio" : "Office"}</span><p></p></div>`);
+      const ln = el(`<div class="cl ${who}"><span>${who === "agent" ? (state.lang === "es" ? "IA" : "AI") : state.lang === "es" ? "Consultorio" : "Office"}</span><p></p></div>`);
       log.appendChild(ln);
       const ptag = ln.querySelector("p");
       for (let i = 0; i <= text.length; i += 3) { ptag.textContent = text.slice(0, i); await sleep(12); }
@@ -338,12 +342,12 @@ async function callForMe(id) {
   const ok = await runCall(p, q.plan);
   const L = state.lang === "es";
   if (ok) {
-    addMsg("bot", (L ? `¡Buenas noticias! Llamé a <b>${p.name}</b>: sí acepta ${plan(q.plan).name}. Próxima cita: <b>${fmtDate(p.nextDays)}</b>. ¿Quieres su teléfono para separarla? ${p.phone}`
-      : `Good news! I called <b>${p.name}</b>: they do accept ${plan(q.plan).name}. Next opening: <b>${fmtDate(p.nextDays)}</b>. Their number: ${p.phone}`));
+    addMsg("bot", (L ? `¡Buenas noticias! Llamé a <b>${nm(p)}</b>: sí acepta ${plan(q.plan).name}. Próxima cita: <b>${fmtDate(p.nextDays)}</b>. ¿Quieres su teléfono para separarla? ${p.phone}`
+      : `Good news! I called <b>${nm(p)}</b>: they do accept ${plan(q.plan).name}. Next opening: <b>${fmtDate(p.nextDays)}</b>. Their number: ${p.phone}`));
   } else {
     state.avoided++;
-    addMsg("bot", L ? `Llamé a <b>${p.name}</b> y ya <b>no</b> acepta ${plan(q.plan).name}. Lo marqué en el directorio para que nadie más pierda esa llamada.`
-      : `I called <b>${p.name}</b> and they <b>no longer</b> accept ${plan(q.plan).name}. I flagged it so nobody else wastes that call.`);
+    addMsg("bot", L ? `Llamé a <b>${nm(p)}</b> y ya <b>no</b> acepta ${plan(q.plan).name}. Lo marqué en el directorio para que nadie más pierda esa llamada.`
+      : `I called <b>${nm(p)}</b> and they <b>no longer</b> accept ${plan(q.plan).name}. I flagged it so nobody else wastes that call.`);
   }
   if (btn) {
     btn.closest(".card").classList.add(ok ? "done-ok" : "done-bad");
@@ -360,8 +364,20 @@ function reportWrong(id) {
   Object.assign(p.plans[q.plan], { verifiedDaysAgo: 120, source: "patient_report" }); // pushes it back to the verification queue
   document.querySelector(`#card-${id}`)?.classList.add("done-bad");
   addMsg("bot", state.lang === "es"
-    ? `Gracias por avisar. Puse a <b>${p.name}</b> primero en la cola de verificación; la IA lo confirma hoy mismo. Tu reporte es anónimo.`
-    : `Thanks for letting us know. <b>${p.name}</b> is now first in the verification queue; the AI will re-confirm today. Your report is anonymous.`);
+    ? `Gracias por avisar. Puse a <b>${nm(p)}</b> primero en la cola de verificación; la IA lo confirma hoy mismo. Tu reporte es anónimo.`
+    : `Thanks for letting us know. <b>${nm(p)}</b> is now first in the verification queue; the AI will re-confirm today. Your report is anonymous.`);
+}
+
+// Doctor's display name: "Dra." is the Spanish honorific; English uses "Dr." for everyone.
+const nm = (p) => (state.lang === "en" ? p.name.replace(/^Dra\. /, "Dr. ") : p.name);
+
+// Keep the whole iPhone visible on laptop screens.
+function fitPhone() {
+  const ph = $(".iphone");
+  if (innerWidth <= 560) { ph.style.zoom = ""; return; }
+  ph.style.zoom = "";
+  const top = ph.getBoundingClientRect().top + scrollY; // the hero sits above the phone
+  ph.style.zoom = Math.max(0.62, Math.min(1, (innerHeight - top - 20) / 868)).toFixed(3);
 }
 
 function welcome() {
@@ -435,7 +451,7 @@ async function guidedDemo() {
   runRound(); await sleep(400); await waitIdle();
   setTab("impact");
   await caption("Y por primera vez, vemos el acceso real: dónde no hay especialistas que acepten cada plan.", "And for the first time, we see real access: where no specialist accepts each plan.", 4500);
-  await caption("¿Coge Mi Plan? — Antes de llamar, pregúntanos.", "¿Coge Mi Plan? — Before you call, ask us.", 3500);
+  await caption("¿Coge Mi Plan? — Antes de llamar, pregúntanos.", "Takes My Plan? — Before you call, ask us.", 3500);
   $("#caption").hidden = true;
   document.body.classList.remove("demoing");
   state.demo = false;
@@ -447,18 +463,18 @@ function renderPharmacy() {
   state.ph = r;
   const rows = r.confirmed.map(({ p, d }) => {
     const s = p.plans[$("#ph-plan").value];
-    return `<tr><td><b>${p.name}</b><div class="muted small">${town(p.town).name} · ${Math.round(d)} km</div></td><td>${p.phone}</td><td>${fmtDate(p.nextDays)}</td>
+    return `<tr><td><b>${nm(p)}</b><div class="muted small">${town(p.town).name} · ${Math.round(d)} km</div></td><td>${p.phone}</td><td>${fmtDate(p.nextDays)}</td>
       <td><span class="badge ok">✓ ${t("daysAgo")(s.verifiedDaysAgo)}</span></td><td><button class="link" data-phreport="${p.id}">${t("phReport")}</button></td></tr>`;
   }).join("");
   $("#ph-results").innerHTML = r.confirmed.length
-    ? `<table><thead><tr><th>${t("colProvider")}</th><th>Tel.</th><th>${t("nextAppt")}</th><th>${t("verified")}</th><th></th></tr></thead><tbody>${rows}</tbody></table>`
+    ? `<table><thead><tr><th>${t("colProvider")}</th><th>${t("tel")}</th><th>${t("nextAppt")}</th><th>${t("verified")}</th><th></th></tr></thead><tbody>${rows}</tbody></table>`
     : `<p class="muted">${t("phNone")}</p>`;
   $("#ph-summary").innerHTML = `<b>${r.listed.length}</b> ${t("listed").toLowerCase()} · <b class="okc">${r.confirmed.length}</b> ${t("confirmed").toLowerCase()} · <b class="bad">${r.ghost.length}</b> ${t("ghost").toLowerCase()}`;
 }
 function copyPharmacy() {
   const pl = plan($("#ph-plan").value).name, sp = spec($("#ph-spec").value)[state.lang];
-  const lines = state.ph.confirmed.slice(0, 5).map(({ p }) => `• ${p.name} — ${p.phone} — ${town(p.town).name}`);
-  const txt = `${sp} · ${pl}\n${lines.join("\n")}\n— Coge Mi Plan`;
+  const lines = state.ph.confirmed.slice(0, 5).map(({ p }) => `• ${nm(p)} — ${p.phone} — ${town(p.town).name}`);
+  const txt = `${sp} · ${pl}\n${lines.join("\n")}\n— ${t("brandShort")}`;
   navigator.clipboard?.writeText(txt).catch(() => {});
   const b = $("#ph-copy"); b.textContent = t("phCopied"); setTimeout(() => (b.textContent = t("phCopy")), 1500);
 }
@@ -487,7 +503,7 @@ function renderVerify() {
   $("#v-ghost").textContent = state.ghostsFound;
   renderSources();
   $("#vtable tbody").innerHTML = rows.map((r, i) => `<tr id="vrow-${i}">
-    <td><b>${r.p.name}</b><div class="muted small">${spec(r.p.specialty)[state.lang]} · ${town(r.p.town).name}</div></td>
+    <td><b>${nm(r.p)}</b><div class="muted small">${spec(r.p.specialty)[state.lang]} · ${town(r.p.town).name}</div></td>
     <td>${plan(r.planId).name}</td>
     <td>${t("daysAgo")(r.p.plans[r.planId].verifiedDaysAgo)}</td>
     <td>${r.demand}</td>
@@ -532,7 +548,7 @@ function renderImpact() {
   const planId = $("#i-plan").value;
   const cell = (sid, region) => providers.filter((p) => p.specialty === sid && town(p.town).region === region && p.plans[planId].accepts && p.acceptsNew).length;
   let deserts = 0;
-  const head = `<tr><th></th>${REGIONS.map((r) => `<th>${r}</th>`).join("")}</tr>`;
+  const head = `<tr><th></th>${REGIONS.map((r) => `<th>${t("regions")[r]}</th>`).join("")}</tr>`;
   const body = SPECIALTIES.map((s) => `<tr><th>${s[state.lang]}</th>${REGIONS.map((r) => {
     const n = cell(s.id, r);
     if (n === 0) deserts++;
@@ -570,17 +586,18 @@ function exportCsv() {
 // ---------- shell ----------
 function applyLang() {
   document.documentElement.lang = state.lang;
+  document.title = t("docTitle");
   document.querySelectorAll("[data-t]").forEach((n) => (n.textContent = t(n.dataset.t)));
   $("#msg").placeholder = t("placeholder");
   $("#suggest").innerHTML = t("suggestions").map((s) => `<button class="sugg">${s}</button>`).join("");
   $("#lang").textContent = state.lang === "es" ? "EN" : "ES";
   const keep = ["ph-spec", "ph-plan", "ph-town"].map((id) => $("#" + id).value);
   $("#ph-spec").innerHTML = SPECIALTIES.map((s) => `<option value="${s.id}">${s[state.lang]}</option>`).join("");
-  $("#ph-plan").innerHTML = PLANS.map((p) => `<option value="${p.id}">${p.name}</option>`).join("");
+  $("#ph-plan").innerHTML = PLANS.map((p) => `<option value="${p.id}">${nm(p)}</option>`).join("");
   $("#ph-town").innerHTML = TOWNS.map((tw) => `<option value="${tw.id}">${tw.name}</option>`).join("");
   ["ph-spec", "ph-plan", "ph-town"].forEach((id, i) => ($("#" + id).value = keep[i] || { "ph-spec": "derm", "ph-plan": "vital", "ph-town": "caguas" }[id]));
   renderPharmacy();
-  $("#i-plan").innerHTML = PLANS.map((p) => `<option value="${p.id}">${p.name} · ${p.kind}</option>`).join("");
+  $("#i-plan").innerHTML = PLANS.map((p) => `<option value="${p.id}">${nm(p)} · ${state.lang === "es" ? p.kind : p.kindEn}</option>`).join("");
   if (!$("#calllog").children.length || $("#calllog .idle")) $("#calllog").innerHTML = `<p class="idle muted">${t("callIdle")}</p>`;
   renderIntent(state.ctx);
   renderVerify();
@@ -597,7 +614,17 @@ function setTab(tab) {
 
 function init() {
   document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => setTab(b.dataset.tab)));
-  $("#lang").addEventListener("click", () => { state.lang = state.lang === "es" ? "en" : "es"; applyLang(); });
+  $("#lang").addEventListener("click", () => {
+    if (state.demo) return;
+    state.lang = state.lang === "es" ? "en" : "es";
+    // Start the conversation over so every bubble is in one language.
+    state.ctx = {}; state.last = null; state.source = null;
+    $("#chat").innerHTML = "";
+    $("#funnel").innerHTML = `<p class="muted small">—</p>`;
+    $("#calllog").innerHTML = "";
+    applyLang();
+    welcome();
+  });
   $("#composer").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#msg").value; $("#msg").value = ""; handleUser(v); });
   $("#mic").addEventListener("click", voiceNote);
   $("#demo").addEventListener("click", guidedDemo);
@@ -611,7 +638,7 @@ function init() {
     const st = e.target.closest("[data-start]"); if (st) return startChoice(st.dataset.start);
     const d = e.target.closest("[data-dial]"); if (d) {
       const p = byId.get(+d.dataset.dial);
-      return addMsg("bot", state.lang === "es" ? `📞 Marcando a ${p.name}… <span class="muted small">(prototipo: número ficticio ${p.phone})</span>` : `📞 Dialing ${p.name}… <span class="muted small">(prototype: fictional number ${p.phone})</span>`);
+      return addMsg("bot", state.lang === "es" ? `📞 Marcando a ${nm(p)}… <span class="muted small">(prototipo: número ficticio ${p.phone})</span>` : `📞 Dialing ${nm(p)}… <span class="muted small">(prototype: fictional number ${p.phone})</span>`);
     }
   });
   $("#v-run").addEventListener("click", runRound);
@@ -627,6 +654,7 @@ function init() {
   applyLang();
   welcome();
   renderStats();
+  fitPhone(); addEventListener("resize", fitPhone);
   fetch("/api/understand", { cache: "no-store" }).catch(() => {}); // wake the function before the first message
 }
 init();

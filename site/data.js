@@ -2,12 +2,12 @@
 // No real patient or provider data is used anywhere in this prototype.
 
 export const PLANS = [
-  { id: "vital", name: "Plan Vital", kind: "Medicaid", accept: 0.30, aliases: ["vital", "medicaid", "reforma", "plan de gobierno", "tarjeta de salud"] },
-  { id: "triples", name: "Triple-S", kind: "Advantage / Comercial", accept: 0.62, aliases: ["triple-s", "triple s", "triples", "sss", "triple"] },
-  { id: "mmm", name: "MMM", kind: "Medicare Advantage", accept: 0.55, aliases: ["mmm", "medicare y mucho mas", "medicare y mucho más"] },
-  { id: "mcs", name: "MCS", kind: "Advantage / Comercial", accept: 0.52, aliases: ["mcs", "classicare"] },
-  { id: "first", name: "First Medical", kind: "Advantage / Comercial", accept: 0.48, aliases: ["first medical", "first"] },
-  { id: "humana", name: "Humana", kind: "Medicare Advantage", accept: 0.50, aliases: ["humana"] },
+  { id: "vital", name: "Plan Vital", kind: "Medicaid", kindEn: "Medicaid", accept: 0.30, aliases: ["vital", "medicaid", "reforma", "plan de gobierno", "tarjeta de salud"] },
+  { id: "triples", name: "Triple-S", kind: "Advantage / Comercial", kindEn: "Advantage / Commercial", accept: 0.62, aliases: ["triple-s", "triple s", "triples", "sss", "triple"] },
+  { id: "mmm", name: "MMM", kind: "Medicare Advantage", kindEn: "Medicare Advantage", accept: 0.55, aliases: ["mmm", "medicare y mucho mas", "medicare y mucho más"] },
+  { id: "mcs", name: "MCS", kind: "Advantage / Comercial", kindEn: "Advantage / Commercial", accept: 0.52, aliases: ["mcs", "classicare"] },
+  { id: "first", name: "First Medical", kind: "Advantage / Comercial", kindEn: "Advantage / Commercial", accept: 0.48, aliases: ["first medical", "first"] },
+  { id: "humana", name: "Humana", kind: "Medicare Advantage", kindEn: "Medicare Advantage", accept: 0.50, aliases: ["humana"] },
 ];
 
 export const SPECIALTIES = [
