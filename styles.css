@@ -160,3 +160,8 @@ footer { text-align: center; padding: 16px; color: var(--muted); font-size: 12.5
   main, .top { padding-left: 16px; padding-right: 16px; }
   .frow { grid-template-columns: 130px 1fr 40px; }
 }
+
+.srcbar { display: flex; height: 16px; border-radius: 999px; overflow: hidden; gap: 2px; }
+.srclegend { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 10px; font-size: 13.5px; color: var(--muted); }
+.srclegend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; }
+.src-claims { background: var(--teal); } .src-office_portal { background: #4f9e8f; } .src-patient_report { background: #d9a332; } .src-ai_call { background: var(--coral); }

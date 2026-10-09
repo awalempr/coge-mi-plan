@@ -78,7 +78,7 @@ export function buildProviders() {
           const accepts = !cashOnly && r() < p.accept * sp.accept * (town.region === "Metro" ? 1 : 0.92);
           const listed = accepts ? r() < 0.97 : r() < (cashOnly ? 0.75 : 0.55);
           const verifiedDaysAgo = r() < 0.55 ? Math.floor(r() * 60) : 95 + Math.floor(r() * 400);
-          plans[p.id] = { listed, accepts, verifiedDaysAgo, source: verifiedDaysAgo < 90 ? pick(["ai_call", "ai_call", "office_portal", "patient_report"]) : "directory" };
+          plans[p.id] = { listed, accepts, verifiedDaysAgo, source: verifiedDaysAgo < 90 ? pick(["claims", "claims", "claims", "office_portal", "office_portal", "patient_report", "ai_call"]) : "directory" };
         }
         providers.push({
           id: id++,

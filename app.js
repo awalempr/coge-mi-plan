@@ -11,20 +11,20 @@ const state = { lang: "es", tab: "patient", ctx: {}, calls: 0, avoided: 0, busy:
 // ---------- i18n ----------
 const T = {
   es: {
-    tagline: "Antes de llamar, pregúntale a Coge Mi Plan.",
+    tagline: "El registro central y verificado de quién acepta qué plan en Puerto Rico.",
     tabPatient: "Paciente", tabVerify: "Verificación", tabImpact: "Impacto",
     chatTitle: "Coge Mi Plan", chatSub: "Asistente · responde en segundos",
     placeholder: "Ej: dermatólogo que coja Plan Vital en Caguas",
     send: "Enviar",
     behind: "Lo que pasa detrás", understood: "Entendí", funnel: "Directorio vs. realidad",
     listed: "Listados en el directorio", confirmed: "Confirmados que lo aceptan", ghost: "Ya NO lo aceptan (fantasmas)", unverified: "Sin verificar (+90 días)",
-    callLog: "Llamadas de verificación (IA)", callIdle: "Cuando un consultorio no ha sido verificado, el agente de voz llama por ti y actualiza el directorio para todos.",
+    callLog: "Respaldo: llamada de verificación (IA)", callIdle: "Si un listado no tiene ninguna verificación reciente (reclamaciones, consultorio o pacientes), el agente de voz llama como último recurso y actualiza el registro para todos.",
     callForMe: "Llamar por mí", reportWrong: "No me aceptaron", verified: "Verificado", daysAgo: (d) => d === 0 ? "hoy" : `hace ${d} días`,
-    viaAi: "llamada IA", viaPortal: "portal del consultorio", viaPatient: "reporte de paciente", viaDir: "solo directorio del plan",
+    viaAi: "llamada IA", viaClaims: "reclamación pagada por el plan", viaPortal: "confirmado por el consultorio", viaPatient: "reporte de paciente", viaDir: "solo directorio del plan",
     newPatients: "Acepta pacientes nuevos", nextAppt: "Próxima cita", tele: "Telemedicina", unconf: "El plan dice que sí — sin confirmar",
     statsCalls: "llamadas hechas por la IA", statsAvoided: "llamadas que te ahorraste",
-    vTitle: "Cola de verificación", vSub: "Listados con más de 90 días sin verificar, ordenados por cuántos pacientes los buscan. La ley federal No Surprises Act exige verificar el directorio al menos cada 90 días.",
-    vRun: "Ejecutar ronda de llamadas", vRunning: "Llamando…", vCompliance: "del directorio verificado en ≤ 90 días", vQueue: "listados pendientes", vGhost: "fantasmas encontrados en esta sesión",
+    vTitle: "Registro central: cómo se mantiene verificado", vSub: "Cada listado se confirma con la mejor evidencia disponible: reclamaciones pagadas por el plan, confirmación del consultorio (un toque por WhatsApp al mes) y reportes de pacientes. Abajo: lo que lleva más de 90 días sin evidencia, ordenado por demanda — ahí entra la llamada IA como respaldo. La ley federal No Surprises Act exige verificar cada 90 días.",
+    vRun: "Verificar pendientes", vRunning: "Llamando…", vCompliance: "del registro verificado en ≤ 90 días", vSources: "Fuentes de verificación (últimos 90 días)", vQueue: "listados pendientes", vGhost: "fantasmas encontrados en esta sesión",
     colProvider: "Proveedor", colPlan: "Plan", colLast: "Última verificación", colDemand: "Búsquedas/mes", colResult: "Resultado",
     never: "nunca", pending: "pendiente", yes: "Lo acepta", no: "No lo acepta",
     iTitle: "Mapa de acceso real", iSub: "Especialistas que de verdad aceptan el plan y pacientes nuevos, por región. Rojo = desierto: nadie disponible.",
@@ -35,20 +35,20 @@ const T = {
     suggestions: ["Necesito un dermatólogo que coja Plan Vital en Caguas", "Endocrinólogo con MMM cerca de Ponce", "Psiquiatra que acepte Triple-S en Mayagüez"],
   },
   en: {
-    tagline: "Before you call, ask Coge Mi Plan.",
+    tagline: "Puerto Rico's central, verified registry of who accepts which plan.",
     tabPatient: "Patient", tabVerify: "Verification", tabImpact: "Impact",
     chatTitle: "Coge Mi Plan", chatSub: "Assistant · replies in seconds",
     placeholder: "e.g. dermatologist that takes Plan Vital in Caguas",
     send: "Send",
     behind: "Behind the scenes", understood: "Understood", funnel: "Directory vs. reality",
     listed: "Listed in the plan directory", confirmed: "Confirmed accepting", ghost: "No longer accept it (ghosts)", unverified: "Unverified (90+ days)",
-    callLog: "Verification calls (AI)", callIdle: "When an office hasn't been verified, the voice agent calls for you and updates the directory for everyone.",
+    callLog: "Fallback: AI verification call", callIdle: "If a listing has no recent verification (claims, office or patients), the voice agent calls as a last resort and updates the registry for everyone.",
     callForMe: "Call for me", reportWrong: "They turned me away", verified: "Verified", daysAgo: (d) => d === 0 ? "today" : `${d} days ago`,
-    viaAi: "AI call", viaPortal: "office portal", viaPatient: "patient report", viaDir: "plan directory only",
+    viaAi: "AI call", viaClaims: "paid claim from the plan", viaPortal: "confirmed by the office", viaPatient: "patient report", viaDir: "plan directory only",
     newPatients: "Accepting new patients", nextAppt: "Next opening", tele: "Telehealth", unconf: "Plan says yes — unconfirmed",
     statsCalls: "calls made by the AI", statsAvoided: "calls you didn't have to make",
-    vTitle: "Verification queue", vSub: "Listings not verified in 90+ days, ranked by how many patients search for them. The federal No Surprises Act requires directory verification at least every 90 days.",
-    vRun: "Run call round", vRunning: "Calling…", vCompliance: "of directory verified within 90 days", vQueue: "listings pending", vGhost: "ghosts found this session",
+    vTitle: "Central registry: how it stays verified", vSub: "Every listing is confirmed with the best evidence available: paid claims from the plan, a one-tap monthly WhatsApp confirmation from the office, and patient reports. Below: listings with no evidence in 90+ days, ranked by demand — that is where the AI call steps in as a fallback. The federal No Surprises Act requires verification every 90 days.",
+    vRun: "Verify pending", vRunning: "Calling…", vCompliance: "of registry verified within 90 days", vSources: "Verification sources (last 90 days)", vQueue: "listings pending", vGhost: "ghosts found this session",
     colProvider: "Provider", colPlan: "Plan", colLast: "Last verified", colDemand: "Searches/mo", colResult: "Result",
     never: "never", pending: "pending", yes: "Accepts", no: "Does not accept",
     iTitle: "Real access map", iSub: "Specialists who truly accept the plan and new patients, by region. Red = desert: nobody available.",
@@ -125,7 +125,7 @@ async function botTyping() {
 function card(x, planId, kind) {
   const { p, d } = x;
   const s = p.plans[planId];
-  const via = { ai_call: t("viaAi"), office_portal: t("viaPortal"), patient_report: t("viaPatient"), directory: t("viaDir") }[s.source];
+  const via = { claims: t("viaClaims"), ai_call: t("viaAi"), office_portal: t("viaPortal"), patient_report: t("viaPatient"), directory: t("viaDir") }[s.source];
   const badge = kind === "confirmed"
     ? `<span class="badge ok">✓ ${t("verified")} ${t("daysAgo")(s.verifiedDaysAgo)} · ${via}</span>`
     : `<span class="badge warn">? ${t("unconf")}</span>`;
@@ -306,12 +306,20 @@ function renderVerify() {
   $("#v-compliance").textContent = compliance() + "%";
   $("#v-queue").textContent = queueRows().length.toLocaleString();
   $("#v-ghost").textContent = state.ghostsFound;
+  renderSources();
   $("#vtable tbody").innerHTML = rows.map((r, i) => `<tr id="vrow-${i}">
     <td><b>${r.p.name}</b><div class="muted small">${spec(r.p.specialty)[state.lang]} · ${town(r.p.town).name}</div></td>
     <td>${plan(r.planId).name}</td>
     <td>${t("daysAgo")(r.p.plans[r.planId].verifiedDaysAgo)}</td>
     <td>${r.demand}</td>
     <td class="res">${t("pending")}</td></tr>`).join("");
+}
+function renderSources() {
+  const counts = { claims: 0, office_portal: 0, patient_report: 0, ai_call: 0 };
+  for (const p of providers) for (const pl of PLANS) { const s = p.plans[pl.id]; if (s.listed && s.verifiedDaysAgo < 90 && s.source in counts) counts[s.source]++; }
+  const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
+  const label = { claims: t("viaClaims"), office_portal: t("viaPortal"), patient_report: t("viaPatient"), ai_call: t("viaAi") };
+  $("#v-sources").innerHTML = `<div class="label">${t("vSources")}</div><div class="srcbar">${Object.entries(counts).map(([k, n]) => `<span class="src-${k}" style="flex:${n}"></span>`).join("")}</div><div class="srclegend">${Object.entries(counts).map(([k, n]) => `<span><i class="src-${k}"></i>${label[k]} · <b>${Math.round((n / total) * 100)}%</b></span>`).join("")}</div>`;
 }
 async function runRound() {
   if (state.busy) return;
@@ -331,10 +339,11 @@ async function runRound() {
     row.querySelector(".res").innerHTML = ok ? `<span class="badge ok">✓ ${t("yes")}</span>` : `<span class="badge bad">✗ ${t("no")}</span>`;
     $("#v-ghost").textContent = state.ghostsFound;
   }
-  // Each round in production covers hundreds of listings; reflect a full nightly batch in the compliance metric.
-  queueRows().slice(0, 400).forEach((r) => Object.assign(r.p.plans[r.planId], { verifiedDaysAgo: 0, source: "ai_call" }));
+  // A nightly batch also ingests new paid claims and office confirmations; AI calls only cover what those miss.
+  queueRows().slice(0, 400).forEach((r, i) => Object.assign(r.p.plans[r.planId], { verifiedDaysAgo: 0, source: i % 3 === 2 ? "office_portal" : "claims" }));
   $("#v-compliance").textContent = compliance() + "%";
   $("#v-queue").textContent = queueRows().length.toLocaleString();
+  renderSources();
   btn.disabled = false; btn.textContent = t("vRun");
   state.busy = false;
 }
