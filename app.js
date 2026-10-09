@@ -115,7 +115,7 @@ function addMsg(who, html) {
   const box = $("#chat");
   const m = el(`<div class="msg ${who}"><div class="bubble">${html}</div></div>`);
   box.appendChild(m);
-  box.scrollTop = box.scrollHeight;
+  box.scrollTop = who === "bot" && m.offsetHeight > box.clientHeight * 0.6 ? m.offsetTop - 12 : box.scrollHeight;
   return m;
 }
 async function botTyping() {
@@ -155,7 +155,60 @@ function botReply(q, r) {
   const none = r.confirmed.length === 0
     ? (L ? `<p class="small">No hay confirmados todavía. Puedo llamar a los que no están verificados:</p>` : `<p class="small">No confirmed options yet. I can call the unverified ones:</p>`)
     : "";
-  return `<p>${head}</p>${none}${cards}`;
+  const managed = q.plan !== "triples";
+  const tip = L
+    ? `<p class="tip">🧾 <b>Antes de ir:</b> lleva tu tarjeta del plan y una identificación${managed ? `, y pide el <b>referido</b> a tu médico primario — ${pl.name} suele requerirlo` : ""}.</p>`
+    : `<p class="tip">🧾 <b>Before you go:</b> bring your plan card and ID${managed ? `, and ask your primary doctor for a <b>referral</b> — ${pl.name} usually requires one` : ""}.</p>`;
+  const acts = `<div class="acts">
+    <button class="act" data-act="alert">🔔 ${L ? "Avísame si se abre algo" : "Alert me if something opens"}</button>
+    <button class="act" data-act="family">👪 ${L ? "Enviar a un familiar" : "Send to a family member"}</button>
+    <button class="act ${r.confirmed.length === 0 ? "hot" : ""}" data-act="help">🆘 ${L ? "Nadie me atiende, ¿qué hago?" : "Nobody will see me — what now?"}</button>
+  </div>`;
+  return `<p>${head}</p>${none}${cards}${r.confirmed.length ? tip : ""}${acts}`;
+}
+
+// ---------- when the answer is "nobody": turn a dead end into next steps ----------
+function helpPath() {
+  const { q } = state.last, L = state.lang === "es";
+  const sp = spec(q.specialty), pl = plan(q.plan), tw = town(q.town);
+  const tele = providers.filter((p) => p.specialty === q.specialty && p.telehealth && p.plans[q.plan].accepts && p.acceptsNew).length;
+  const cash = providers.filter((p) => p.specialty === q.specialty && p.cashOnly && km(tw, town(p.town)) <= 45).map((p) => p.cashPrice);
+  const letter = L
+    ? `Soy afiliado(a) de ${pl.name}. Necesito un ${sp.doc.es} cerca de ${tw.name} y los proveedores de su directorio no me aceptan o no tienen citas. Solicito que me asignen un especialista dentro de la red o que autoricen uno fuera de la red al costo de la red. Gracias.`
+    : `I am a ${pl.name} member. I need a ${sp.doc.en} near ${tw.name}, and the providers in your directory will not accept me or have no openings. I request that you assign an in-network specialist or authorize an out-of-network one at in-network cost. Thank you.`;
+  state.letter = letter;
+  const steps = L ? [
+    tele ? `💻 <b>Telemedicina:</b> ${tele} ${sp.doc.es}${tele > 1 ? "s" : ""} en toda la isla aceptan ${pl.name} por video. ¿Te los muestro?` : `💻 No hay telemedicina confirmada para esta especialidad con ${pl.name} todavía.`,
+    `📞 <b>Pídeselo a tu plan:</b> tu plan tiene la responsabilidad de darte acceso a su red. Te redacté el mensaje para servicio al cliente:`,
+    `<div class="letter">${letter}</div><button class="act" data-act="copyletter">📋 Copiar mensaje</button>`,
+    `🏛️ <b>Si no te responden:</b> puedes presentar una querella en la <b>Oficina del Procurador del Paciente</b>.`,
+    cash.length ? `💵 <b>Si decides pagar privado:</b> hay ${cash.length} consultorio${cash.length > 1 ? "s" : ""} cerca, desde <b>$${Math.min(...cash)}</b> la consulta.` : "",
+    `🗺️ Tu búsqueda (anónima) se suma al mapa de desiertos que compartimos con los reguladores.`,
+  ] : [
+    tele ? `💻 <b>Telehealth:</b> ${tele} ${sp.doc.en}${tele > 1 ? "s" : ""} island-wide accept ${pl.name} by video. Want to see them?` : `💻 No confirmed telehealth for this specialty with ${pl.name} yet.`,
+    `📞 <b>Ask your plan:</b> your plan is responsible for giving you access to its network. I drafted the message for member services:`,
+    `<div class="letter">${letter}</div><button class="act" data-act="copyletter">📋 Copy message</button>`,
+    `🏛️ <b>If they don't respond:</b> you can file a complaint with the <b>Patient Advocate Office</b> (Oficina del Procurador del Paciente).`,
+    cash.length ? `💵 <b>If you choose to pay privately:</b> ${cash.length} office${cash.length > 1 ? "s" : ""} nearby, from <b>$${Math.min(...cash)}</b> per visit.` : "",
+    `🗺️ Your (anonymous) search is added to the desert map we share with regulators.`,
+  ];
+  addMsg("bot", steps.filter(Boolean).map((s) => s.startsWith("<div") ? s : `<p>${s}</p>`).join(""));
+}
+
+function chatAction(act) {
+  if (!state.last) return;
+  const { q, r } = state.last, L = state.lang === "es";
+  const sp = spec(q.specialty), pl = plan(q.plan), tw = town(q.town);
+  if (act === "help") return helpPath();
+  if (act === "copyletter") { navigator.clipboard?.writeText(state.letter).catch(() => {}); return addMsg("bot", L ? "Copiado ✓ Pégalo en el chat o correo de tu plan." : "Copied ✓ Paste it into your plan's chat or email."); }
+  if (act === "alert") return addMsg("bot", L
+    ? `🔔 Listo. Te escribo por aquí cuando un ${sp.doc.es} cerca de ${tw.name} confirme ${pl.name} o se abra una cita más temprano. Solo guardo tu número para este aviso; escribe <b>BORRAR</b> y lo elimino.`
+    : `🔔 Done. I'll message you here when a ${sp.doc.en} near ${tw.name} confirms ${pl.name} or an earlier opening appears. I only keep your number for this alert; reply <b>DELETE</b> and it's gone.`);
+  if (act === "family") {
+    const list = r.confirmed.slice(0, 3).map(({ p }) => `• ${p.name} — ${p.phone} (${town(p.town).name})`).join("\n");
+    navigator.clipboard?.writeText(`${sp[state.lang]} · ${pl.name}\n${list || "—"}\n— Coge Mi Plan`).catch(() => {});
+    return addMsg("bot", L ? "👪 Copié la lista para que se la envíes a tu hijo, hija o cuidador. Ellos también pueden escribirme y buscar por ti." : "👪 Copied the list so you can send it to your son, daughter or caregiver. They can also message me and search on your behalf.");
+  }
 }
 
 function missingPrompt(q) {
@@ -165,9 +218,12 @@ function missingPrompt(q) {
   return L ? "¿En qué pueblo estás o cerca de dónde te queda bien ir?" : "Which town are you in, or near where works for you?";
 }
 
-async function handleUser(text) {
+async function handleUser(text, { voice = false } = {}) {
   if (!text.trim() || state.busy) return;
-  addMsg("user", text.replace(/</g, "&lt;"));
+  const safe = text.replace(/</g, "&lt;");
+  addMsg("user", voice
+    ? `<div class="vn">🎤 <span class="wave"></span> 0:0${Math.min(9, 2 + Math.round(text.length / 14))}</div><div class="vn-t">“${safe}”</div>`
+    : safe);
   const parsed = parseQuery(text);
   state.ctx = { ...state.ctx, ...parsed };
   renderIntent(state.ctx);
@@ -284,6 +340,26 @@ function reportWrong(id) {
   addMsg("bot", state.lang === "es"
     ? `Gracias por avisar. Puse a <b>${p.name}</b> primero en la cola de verificación; la IA lo confirma hoy mismo. Tu reporte es anónimo.`
     : `Thanks for letting us know. <b>${p.name}</b> is now first in the verification queue; the AI will re-confirm today. Your report is anonymous.`);
+}
+
+// ---------- voice notes ----------
+// Uses the browser's speech recognition where available (Chrome: es-PR / en-US).
+// Without it (or if the mic is blocked), it plays a sample voice note so the demo never stalls.
+function voiceNote() {
+  if (state.busy) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const mic = $("#mic");
+  const sample = () => handleUser(t("suggestions")[0], { voice: true });
+  if (!SR) return sample();
+  const rec = new SR();
+  rec.lang = state.lang === "es" ? "es-PR" : "en-US";
+  rec.interimResults = false;
+  mic.classList.add("rec");
+  let heard = false;
+  rec.onresult = (e) => { heard = true; handleUser(e.results[0][0].transcript, { voice: true }); };
+  rec.onerror = () => {};
+  rec.onend = () => { mic.classList.remove("rec"); if (!heard) sample(); };
+  rec.start();
 }
 
 // ---------- pharmacy counter ----------
@@ -444,10 +520,13 @@ function init() {
   document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => setTab(b.dataset.tab)));
   $("#lang").addEventListener("click", () => { state.lang = state.lang === "es" ? "en" : "es"; applyLang(); });
   $("#composer").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#msg").value; $("#msg").value = ""; handleUser(v); });
+  $("#mic").addEventListener("click", voiceNote);
+  $("#bigtext").addEventListener("click", () => document.body.classList.toggle("big"));
   $("#suggest").addEventListener("click", (e) => { if (e.target.matches(".sugg")) handleUser(e.target.textContent); });
   $("#chat").addEventListener("click", (e) => {
     const c = e.target.closest("[data-call]"); if (c) return callForMe(+c.dataset.call);
     const r = e.target.closest("[data-report]"); if (r) return reportWrong(+r.dataset.report);
+    const a = e.target.closest("[data-act]"); if (a) return chatAction(a.dataset.act);
   });
   $("#v-run").addEventListener("click", runRound);
   ["ph-spec", "ph-plan", "ph-town"].forEach((id) => $("#" + id).addEventListener("change", renderPharmacy));
