@@ -1,4 +1,4 @@
-# ¿Coge Mi Plan? — Who *actually* takes your health plan?
+# ¿Coge Mi Plan? (Takes My Plan?): who *actually* accepts your health plan
 
 **Caribbean AI Summit Healthcare Hackathon 2026 · Track: Access to care**
 
@@ -45,7 +45,7 @@ cd site && python3 -m http.server 5178
 - Limitation: office answers can change daily, so we show the verification age and source on every result.
 
 ## Context
-- Problem source: a voice memo from a former hospital nurse in PR (see `docs/voice-memo-insights.md`).
+- Problem source: a voice memo from a former hospital nurse in Puerto Rico, anonymized in `docs/voice-memo-insights.md` (the raw recording is not published).
 - Research and sources: `docs/research.md`.
 
 ## Guided demo
