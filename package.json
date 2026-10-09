@@ -1,0 +1,14 @@
+{
+  "name": "coge-mi-plan",
+  "private": true,
+  "type": "module",
+  "description": "Verified registry of which specialists accept which health plan in Puerto Rico (hackathon prototype).",
+  "scripts": {
+    "dev": "netlify dev",
+    "serve": "cd site && python3 -m http.server 5178"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.131.0",
+    "@netlify/blobs": "11.1.4"
+  }
+}

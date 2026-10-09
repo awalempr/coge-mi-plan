@@ -314,3 +314,6 @@ body.big main, body.big .hero { zoom: 1.18; }
   main { padding-top: 0; }
   .phone { height: calc(100svh - 112px); }
 }
+
+.engine { font-size: 12px; color: var(--label-3); align-self: center; margin-left: 4px; }
+.urgent { color: var(--red); font-weight: 600; }

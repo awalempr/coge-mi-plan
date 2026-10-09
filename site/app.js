@@ -1,4 +1,5 @@
 import { PLANS, SPECIALTIES, TOWNS, REGIONS, buildProviders, dateFromDays } from "./data.js";
+import { parseQuery, makeSearch, km } from "./core.js";
 
 const providers = buildProviders();
 const byId = new Map(providers.map((p) => [p.id, p]));
@@ -64,51 +65,14 @@ const T = {
 const t = (k) => T[state.lang][k];
 
 // ---------- helpers ----------
-const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 const $ = (sel) => document.querySelector(sel);
 const el = (html) => { const d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstElementChild; };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-function km(a, b) {
-  const R = 6371, toR = Math.PI / 180;
-  const dLat = (b.lat - a.lat) * toR, dLon = (b.lon - a.lon) * toR;
-  const x = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * toR) * Math.cos(b.lat * toR) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(x));
-}
 function fmtDate(days) {
   return dateFromDays(days).toLocaleDateString(state.lang === "es" ? "es-PR" : "en-US", { weekday: "short", month: "short", day: "numeric" });
 }
 
-// ---------- natural-language intent parsing (ES/EN) ----------
-// Deterministic so the demo never fails offline; in production an LLM fills the same slots.
-export function parseQuery(text) {
-  const n = norm(text);
-  const out = {};
-  const s = SPECIALTIES.find((s) => s.rx.test(n));
-  if (s) out.specialty = s.id;
-  const p = PLANS.find((p) => p.aliases.some((a) => n.includes(norm(a))));
-  if (p) out.plan = p.id;
-  const tw = TOWNS.find((tw) => n.includes(norm(tw.name)));
-  if (tw) out.town = tw.id;
-  return out;
-}
-
-// ---------- search ----------
-function status(pr, planId) {
-  const s = pr.plans[planId];
-  if (s.verifiedDaysAgo < 90) return s.accepts && pr.acceptsNew ? "confirmed" : "ghost";
-  return "unverified";
-}
-function search({ specialty, plan: planId, town: townId }) {
-  const origin = town(townId);
-  const listed = providers
-    .filter((p) => p.specialty === specialty && p.plans[planId].listed)
-    .map((p) => ({ p, d: km(origin, town(p.town)) }))
-    .filter((x) => x.d <= 45)
-    .sort((a, b) => a.d + a.p.nextDays / 8 - (b.d + b.p.nextDays / 8));
-  const groups = { confirmed: [], ghost: [], unverified: [] };
-  for (const x of listed) groups[status(x.p, planId)].push(x);
-  return { listed, ...groups };
-}
+const search = makeSearch(providers);
 
 // ---------- chat ----------
 function addMsg(who, html) {
@@ -242,10 +206,23 @@ async function handleUser(text, { voice = false } = {}) {
   addMsg("user", voice
     ? `<div class="vn">🎤 <span class="wave"></span> 0:0${Math.min(9, 2 + Math.round(text.length / 14))}</div><div class="vn-t">“${safe}”</div>`
     : safe);
-  const parsed = parseQuery(text);
-  state.ctx = { ...state.ctx, ...parsed };
+  const typing = addMsg("bot", `<span class="typing"><i></i><i></i><i></i></span>`);
+  const ai = await understandRemote(text, state.ctx);
+  typing.remove();
+  if (ai) {
+    state.ctx = { ...state.ctx, ...pick(ai) };
+    state.source = ai.source;
+    if (ai.urgent) {
+      addMsg("bot", `<p class="urgent">🚨 ${(ai.note || (state.lang === "es" ? "Si es una emergencia, llama al 911 ahora." : "If this is an emergency, call 911 now.")).replace(/</g, "&lt;")}</p>`);
+      renderIntent(state.ctx);
+      return;
+    }
+  } else {
+    state.ctx = { ...state.ctx, ...parseQuery(text) };
+    state.source = "local";
+    await sleep(350);
+  }
   renderIntent(state.ctx);
-  await botTyping();
   const q = state.ctx;
   if (!q.specialty || !q.plan || !q.town) { addMsg("bot", missingPrompt(q)); return; }
   const r = search(q);
@@ -257,12 +234,34 @@ async function handleUser(text, { voice = false } = {}) {
   if (state.wantHelp && r.confirmed.length === 0) { state.wantHelp = false; await sleep(500); helpPath(); }
 }
 
+const pick = (o) => Object.fromEntries(["specialty", "plan", "town"].filter((k) => o[k]).map((k) => [k, o[k]]));
+
+// Claude reads the message server-side (/api/understand). If the endpoint is missing, slow or down,
+// the deterministic parser takes over so the experience never breaks.
+async function understandRemote(text, known) {
+  if (state.aiOff) return null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 9000);
+  try {
+    const res = await fetch("/api/understand", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, known: pick(known) }), signal: ctrl.signal });
+    if (!res.ok) { if (res.status === 404 || res.status === 405 || res.status === 501) state.aiOff = true; return null; }
+    const out = await res.json();
+    if (out.source !== "claude") state.aiOff = true; // no API key configured: stay local
+    return out;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function renderIntent(q) {
   const chip = (label, v) => `<span class="chip ${v ? "" : "empty"}">${label}: <b>${v || "—"}</b></span>`;
   $("#intent").innerHTML =
     chip(state.lang === "es" ? "Especialidad" : "Specialty", q.specialty && spec(q.specialty)[state.lang]) +
     chip("Plan", q.plan && plan(q.plan).name) +
-    chip(state.lang === "es" ? "Pueblo" : "Town", q.town && town(q.town).name);
+    chip(state.lang === "es" ? "Pueblo" : "Town", q.town && town(q.town).name) +
+    (state.source ? `<span class="engine">${state.source === "claude" ? (state.lang === "es" ? "Entendido por Claude" : "Understood by Claude") : (state.lang === "es" ? "Intérprete local (sin conexión)" : "Local parser (offline)")}</span>` : "");
 }
 
 function renderFunnel(r) {
