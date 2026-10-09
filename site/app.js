@@ -625,6 +625,5 @@ function init() {
   applyLang();
   welcome();
   renderStats();
-  fetch("/api/understand").then((r) => (r.ok ? r.json() : { ai: false })).then((s) => { if (!s.ai) state.aiOff = true; }).catch(() => { state.aiOff = true; });
 }
 init();

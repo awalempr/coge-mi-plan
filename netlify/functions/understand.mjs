@@ -20,7 +20,7 @@ async function overLimit(req, context) {
 const ALLOWED = new Set(["specialty", "plan", "town"]);
 
 export default async (req, context) => {
-  if (req.method === "GET") return Response.json({ ai: aiEnabled() });
+  if (req.method === "GET") return Response.json({ ai: aiEnabled() }, { headers: { "cache-control": "no-store" } });
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
   let body;
   try { body = await req.json(); } catch { return new Response("Bad JSON", { status: 400 }); }
