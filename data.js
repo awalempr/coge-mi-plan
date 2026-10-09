@@ -86,7 +86,7 @@ export function buildProviders() {
           plans,
           specialty: sp.id,
           town: town.id,
-          phone: `787-${String(200 + Math.floor(r() * 799))}-${String(1000 + Math.floor(r() * 8999))}`,
+          phone: (r(), `787-555-01${String(Math.floor(r() * 100)).padStart(2, "0")}`), // reserved fictional range: never rings a real person (two draws keep the seeded sequence stable)
           acceptsNew: r() < 0.82,
           nextDays: 3 + Math.floor(r() * (sp.accept < 0.7 ? 120 : 60)),
           cashPrice: cashOnly ? 120 + Math.floor(r() * 9) * 15 : null,

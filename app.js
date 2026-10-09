@@ -132,7 +132,7 @@ function card(x, planId, kind) {
     ? `<span class="badge ok">✓ ${t("verified")} ${t("daysAgo")(s.verifiedDaysAgo)} · ${via}</span>`
     : `<span class="badge warn">? ${t("unconf")}</span>`;
   const actions = kind === "confirmed"
-    ? `<button class="link" data-report="${p.id}">${t("reportWrong")}</button>`
+    ? `<button class="pill dial" data-dial="${p.id}">📞 ${state.lang === "es" ? "Llamar" : "Call"}</button> <button class="link" data-report="${p.id}">${t("reportWrong")}</button>`
     : `<button class="pill" data-call="${p.id}">📞 ${t("callForMe")}</button>`;
   return `<div class="card" id="card-${p.id}">
     <div class="card-top"><b>${p.name}</b><span class="dist">${Math.round(d)} km</span></div>
@@ -211,11 +211,29 @@ function chatAction(act) {
   }
 }
 
+const quick = (opts) => `<div class="qr">${opts.map((o) => `<button class="qrb" data-say="${o}">${o}</button>`).join("")}</div>`;
 function missingPrompt(q) {
   const L = state.lang === "es";
-  if (!q.specialty) return L ? "¿Qué tipo de especialista necesitas? (ej: dermatólogo, cardiólogo, psiquiatra)" : "What kind of specialist do you need? (e.g. dermatologist, cardiologist, psychiatrist)";
-  if (!q.plan) return L ? "¿Qué plan médico tienes? (Plan Vital, Triple-S, MMM, MCS, First Medical, Humana)" : "Which health plan do you have? (Plan Vital, Triple-S, MMM, MCS, First Medical, Humana)";
-  return L ? "¿En qué pueblo estás o cerca de dónde te queda bien ir?" : "Which town are you in, or near where works for you?";
+  if (!q.specialty) return (L ? "¿Qué especialista necesitas? Toca uno o dímelo con tus palabras." : "Which specialist do you need? Tap one or say it in your own words.")
+    + quick(["derm", "cardio", "endo", "psiq", "neuro", "oftal", "reuma", "uro"].map((id) => cap(spec(id).doc[state.lang])));
+  if (!q.plan) return (L ? "¿Qué plan médico tienes? Está en tu tarjeta del plan." : "Which health plan do you have? It's on your plan card.")
+    + quick(PLANS.map((p) => p.name));
+  return (L ? "¿En qué pueblo te queda bien ir?" : "Which town works for you?")
+    + quick(["San Juan", "Bayamón", "Carolina", "Caguas", "Arecibo", "Mayagüez", "Ponce", "Yauco", "Humacao"]);
+}
+const cap = (s) => s[0].toUpperCase() + s.slice(1);
+
+// Big first-screen choices: nobody has to know what to type.
+function startChoice(kind) {
+  const L = state.lang === "es";
+  state.ctx = {};
+  state.wantHelp = kind === "help";
+  const label = { find: L ? "🔎 Busco un especialista" : "🔎 I need a specialist", family: L ? "👪 Busco para un familiar" : "👪 It's for a family member", help: L ? "🆘 Nadie me atiende" : "🆘 Nobody will see me" }[kind];
+  addMsg("user", label);
+  const pre = kind === "family"
+    ? (L ? "¡Qué bueno que ayudas! Busco por tu familiar y te paso la lista para enviársela. " : "Great that you're helping! I'll search for them and give you a list to send. ")
+    : kind === "help" ? (L ? "Vamos a encontrar una salida. " : "Let's find you a way in. ") : "";
+  addMsg("bot", pre + missingPrompt(state.ctx));
 }
 
 async function handleUser(text, { voice = false } = {}) {
@@ -236,6 +254,7 @@ async function handleUser(text, { voice = false } = {}) {
   addMsg("bot", botReply(q, r));
   renderFunnel(r);
   renderStats();
+  if (state.wantHelp && r.confirmed.length === 0) { state.wantHelp = false; await sleep(500); helpPath(); }
 }
 
 function renderIntent(q) {
@@ -342,6 +361,18 @@ function reportWrong(id) {
     : `Thanks for letting us know. <b>${p.name}</b> is now first in the verification queue; the AI will re-confirm today. Your report is anonymous.`);
 }
 
+function welcome() {
+  const L = state.lang === "es";
+  addMsg("bot", (L
+    ? "¡Hola! 👋 Te digo qué especialistas <b>de verdad</b> aceptan tu plan hoy, sin que tengas que llamar a nadie. Toca una opción, escribe o mándame una nota de voz 🎤."
+    : "Hi! 👋 I'll tell you which specialists <b>actually</b> accept your plan today, no calls needed. Tap an option, type, or send me a voice note 🎤.")
+    + `<div class="starts">
+      <button class="start" data-start="find">🔎 ${L ? "Busco un especialista" : "I need a specialist"}</button>
+      <button class="start" data-start="family">👪 ${L ? "Busco para un familiar" : "It's for a family member"}</button>
+      <button class="start" data-start="help">🆘 ${L ? "Nadie me atiende" : "Nobody will see me"}</button>
+    </div>`);
+}
+
 // ---------- voice notes ----------
 // Uses the browser's speech recognition where available (Chrome: es-PR / en-US).
 // Without it (or if the mic is blocked), it plays a sample voice note so the demo never stalls.
@@ -360,6 +391,51 @@ function voiceNote() {
   rec.onerror = () => {};
   rec.onend = () => { mic.classList.remove("rec"); if (!heard) sample(); };
   rec.start();
+}
+
+// ---------- guided demo: the whole story in ~90 seconds, with captions ----------
+async function caption(es, en, ms = 2600) {
+  const c = $("#caption");
+  c.textContent = state.lang === "es" ? es : en;
+  c.hidden = false;
+  await sleep(ms);
+}
+async function waitIdle() { while (state.busy) await sleep(150); }
+async function guidedDemo() {
+  if (state.demo) return;
+  state.demo = true;
+  document.body.classList.add("demoing");
+  const L = state.lang === "es";
+  setTab("patient");
+  $("#chat").innerHTML = ""; state.ctx = {}; welcome();
+  await caption("Una paciente de Caguas necesita un dermatólogo. Tiene Plan Vital. Manda una nota de voz.", "A patient in Caguas needs a dermatologist. She has Plan Vital. She sends a voice note.", 3200);
+  await handleUser(t("suggestions")[0], { voice: true });
+  const { r: res } = state.last;
+  await caption(`El directorio del plan lista ${res.listed.length}. Solo ${res.confirmed.length} confirmado${res.confirmed.length === 1 ? "" : "s"}. ${res.ghost.length} son fantasmas: llamadas que ya no tiene que hacer.`,
+    `The plan directory lists ${res.listed.length}. Only ${res.confirmed.length} confirmed. ${res.ghost.length} are ghosts: calls she no longer has to make.`, 4200);
+  const btn = document.querySelector("[data-call]");
+  if (btn) {
+    await caption("Un consultorio no se ha verificado en meses. El agente IA llama — solo como respaldo.", "One office hasn't been verified in months. The AI agent calls — only as a fallback.", 2600);
+    await callForMe(+btn.dataset.call); await waitIdle();
+    await caption("La respuesta actualiza el registro para todos los pacientes.", "The answer updates the registry for every patient.", 2800);
+  }
+  await caption("Ahora un adulto mayor en Yauco necesita un psiquiatra. Toca, no escribe.", "Now an older adult in Yauco needs a psychiatrist. He taps — no typing.", 3000);
+  startChoice("help"); await sleep(900);
+  await handleUser(cap(spec("psiq").doc[state.lang])); await sleep(700);
+  await handleUser("Plan Vital"); await sleep(700);
+  await handleUser("Yauco"); await sleep(1600);
+  await caption("Nadie lo acepta. En vez de un callejón sin salida: telemedicina, una carta al plan y el Procurador del Paciente.", "Nobody accepts it. Instead of a dead end: telehealth, a letter to the plan and the Patient Advocate.", 5000);
+  setTab("pharmacy");
+  await caption("En la farmacia de la comunidad, el farmacéutico contesta “¿quién coge mi plan?” en segundos.", "At the community pharmacy, the pharmacist answers “who takes my plan?” in seconds.", 4200);
+  setTab("verify");
+  await caption("El registro se verifica con reclamaciones pagadas, el consultorio y los pacientes. La IA llena los huecos.", "The registry is verified with paid claims, offices and patients. AI fills the gaps.", 2600);
+  runRound(); await sleep(400); await waitIdle();
+  setTab("impact");
+  await caption("Y por primera vez, vemos el acceso real: dónde no hay especialistas que acepten cada plan.", "And for the first time, we see real access: where no specialist accepts each plan.", 4500);
+  await caption("¿Coge Mi Plan? — Antes de llamar, pregúntanos.", "¿Coge Mi Plan? — Before you call, ask us.", 3500);
+  $("#caption").hidden = true;
+  document.body.classList.remove("demoing");
+  state.demo = false;
 }
 
 // ---------- pharmacy counter ----------
@@ -521,12 +597,19 @@ function init() {
   $("#lang").addEventListener("click", () => { state.lang = state.lang === "es" ? "en" : "es"; applyLang(); });
   $("#composer").addEventListener("submit", (e) => { e.preventDefault(); const v = $("#msg").value; $("#msg").value = ""; handleUser(v); });
   $("#mic").addEventListener("click", voiceNote);
+  $("#demo").addEventListener("click", guidedDemo);
   $("#bigtext").addEventListener("click", () => document.body.classList.toggle("big"));
   $("#suggest").addEventListener("click", (e) => { if (e.target.matches(".sugg")) handleUser(e.target.textContent); });
   $("#chat").addEventListener("click", (e) => {
     const c = e.target.closest("[data-call]"); if (c) return callForMe(+c.dataset.call);
     const r = e.target.closest("[data-report]"); if (r) return reportWrong(+r.dataset.report);
     const a = e.target.closest("[data-act]"); if (a) return chatAction(a.dataset.act);
+    const s = e.target.closest("[data-say]"); if (s) return handleUser(s.dataset.say);
+    const st = e.target.closest("[data-start]"); if (st) return startChoice(st.dataset.start);
+    const d = e.target.closest("[data-dial]"); if (d) {
+      const p = byId.get(+d.dataset.dial);
+      return addMsg("bot", state.lang === "es" ? `📞 Marcando a ${p.name}… <span class="muted small">(prototipo: número ficticio ${p.phone})</span>` : `📞 Dialing ${p.name}… <span class="muted small">(prototype: fictional number ${p.phone})</span>`);
+    }
   });
   $("#v-run").addEventListener("click", runRound);
   ["ph-spec", "ph-plan", "ph-town"].forEach((id) => $("#" + id).addEventListener("change", renderPharmacy));
@@ -539,9 +622,7 @@ function init() {
   $("#i-plan").addEventListener("change", renderImpact);
   $("#i-export").addEventListener("click", exportCsv);
   applyLang();
-  addMsg("bot", state.lang === "es"
-    ? "¡Hola! 👋 Dime qué especialista necesitas, tu plan médico y tu pueblo. Te digo quién <b>de verdad</b> lo acepta hoy — sin que tengas que llamar a nadie."
-    : "Hi! 👋 Tell me the specialist you need, your health plan and your town. I'll tell you who <b>actually</b> accepts it today — no calls needed.");
+  welcome();
   renderStats();
 }
 init();
