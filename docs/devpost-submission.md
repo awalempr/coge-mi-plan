@@ -21,8 +21,8 @@ The memo named three problems: specialists who don't take your plan, nurses trac
 |---|---|---|---|
 | Who it helps | 3.2M residents, including 1.4M on Plan Vital and 771K aged 65+ | Nurses in one hospital per sale | Patients of one lab network |
 | Time to launch | Weeks, on WhatsApp | Procurement + EHR integration | One operator partnership |
-| Who pays | Health plans (federal 90-day directory rule) | Hospital IT budget | The lab operator |
-| Patient records needed | None | Full records | Scheduling data |
+| Who pays | Health plans (federal directory-accuracy rules) | Hospital IT budget | The lab operator |
+| Patient data needed | None from patients (plans share only de-identified provider–plan pairs) | Full patient records | Patient scheduling data |
 
 Patient first means the most people and the fastest launch.
 
@@ -57,7 +57,7 @@ The data problem is the patient problem. Verifying who accepts which plan, and s
 A 90-day pilot in Caguas: three specialties, two plans, ten CUD community pharmacies. We'll measure ghost-listing rate, days to first appointment, and calls saved. Then booking, lab virtual lines, and nurse task tools on the same platform.
 
 ### Data and privacy
-The demo uses **100% synthetic data** with fictional providers and the reserved 555 phone range. The verification calls are simulated. No patient records are stored, and searches are anonymous. The claims-based verification feed would require data-sharing agreements with the plans.
+The demo uses **100% synthetic data** with fictional providers and the reserved 555 phone range. The verification calls are simulated. No patient records are stored, and searches are anonymous. The claims-based verification feed would require data-sharing agreements with the plans and would use only de-identified provider–plan pairs, never patient identities.
 
 ## Built with (tags)
 claude, anthropic, javascript, html5, css3, netlify, netlify-functions, twilio, whatsapp, remotion, elevenlabs

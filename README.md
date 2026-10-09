@@ -1,5 +1,9 @@
 # ¿Coge Mi Plan? (Takes My Plan?): who *actually* accepts your health plan
 
+<p align="center"><img src="docs/images/hero.jpg" alt="Coge Mi Plan: of 14 dermatologists the Plan Vital directory lists near Caguas, 1 is confirmed and 8 are ghosts" width="900"></p>
+
+<p align="center"><b><a href="https://coge-mi-plan.netlify.app">Live demo</a></b> · <a href="docs/pitch-script.md">Pitch script</a> · <a href="docs/pitch-script-es.md">Guion en español</a> · <a href="docs/devpost-submission.md">Project story</a></p>
+
 **Caribbean AI Summit Healthcare Hackathon 2026 · Track: Access to care**
 
 In Puerto Rico, finding a specialist who accepts your *plan médico* means calling office after office, because plan directories are full of "ghost" listings: doctors who dropped the plan, went cash-only, or aren't taking new patients. **¿Coge Mi Plan?** is a **central, verified registry of who accepts which plan across the island**. Patients, pharmacies, plans and regulators all read from the same source of truth.
@@ -13,7 +17,7 @@ Each listing is verified with the best evidence available:
 ## What the prototype shows
 1. **Patient:** tap-first and voice-first (big start buttons, quick replies, voice notes, A+ large text). A bilingual (ES/EN) chat. "Dermatólogo que coja Plan Vital en Caguas" returns verified specialists with the verification date, source and next opening, plus how many listings are ghosts. "Llamar por mí" runs the AI fallback call.
 2. **Pharmacy:** a counter mode for community pharmacies. The pharmacist answers "¿quién coge mi plan?" in seconds, copies the list for the patient's WhatsApp, and reports turn-aways with one tap.
-3. **Verification:** the registry's verification-source mix and 90-day compliance (No Surprises Act §116), plus the queue of stale listings ranked by patient demand.
+3. **Verification:** the registry's verification-source mix and directory-accuracy compliance (30-day updates for Medicare Advantage and Medicaid; 90-day verification for commercial plans under No Surprises Act §116), plus the queue of stale listings ranked by patient demand.
 4. **Impact:** a "real access" heatmap (specialty × region, red = specialist desert) and ghost-listing rates by plan, with a CSV export for regulators (OCS / ASES) and plans.
 
 **Live:** https://coge-mi-plan.netlify.app
@@ -45,6 +49,7 @@ cd site && python3 -m http.server 5178
 - Limitation: office answers can change daily, so we show the verification age and source on every result.
 
 ## Context
+- Pitch scripts: `docs/pitch-script.md` (English) and `docs/pitch-script-es.md` (español).
 - Problem source: a voice memo from a former hospital nurse in Puerto Rico, anonymized in `docs/voice-memo-insights.md` (the raw recording is not published).
 - Research and sources: `docs/research.md`.
 

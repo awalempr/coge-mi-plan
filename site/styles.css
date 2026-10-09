@@ -331,3 +331,5 @@ body.big main, body.big .hero { zoom: 1.18; }
   .phone-head { padding-top: 10px; }
   .composer { padding-bottom: 12px; }
 }
+
+.synth { display: inline-block; vertical-align: middle; margin-left: 8px; font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--orange); background: var(--orange-tint); padding: 4px 10px; border-radius: 999px; }

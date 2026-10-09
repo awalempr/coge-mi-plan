@@ -27,7 +27,7 @@ The video is a screen recording of the live app (https://coge-mi-plan.netlify.ap
 | 1:03–1:20 | Type (or paste): **mi mamá tiene la piel bien irritada y le pica, tiene la reforma, vivimos en Toa Baja**, then press Enter. Wait about 4 seconds for the answer. Point the cursor at **"Understood by Claude"** and the three chips. | "That's how people actually talk: a symptom, slang for Medicaid, and a town that isn't on our list. Claude turns it into dermatology, Plan Vital, and the nearest town, Bayamón. Then it shows who's verified." |
 | 1:20–1:32 | Type: **chest pain right now and I can't breathe**, then Enter. | "And safety comes first. Emergency language is caught on the device, before any AI call, and goes straight to 911. Suicidal language also gets 988." |
 | 1:32–1:44 | Click **ES** (top right): the app switches to Spanish. Click **A+**: the text gets bigger. | "It's fully bilingual, and built for the one in four residents over 65: large text, voice notes, and family can search for you." |
-| **1:44–2:00** | Leave the Spanish home screen on screen. | "Patients use it free. Plans pay for it, because federal law already requires them to verify their directories every 90 days. And CUD pharmacies are the front door. Antes de llamar, pregúntale a Coge Mi Plan." |
+| **1:44–2:00** | Leave the Spanish home screen on screen. | "Patients use it free. Plans pay for it, because federal rules already require every plan to keep its directory accurate. And CUD pharmacies are the front door. Antes de llamar, pregúntale a Coge Mi Plan." |
 
 About 270 words in total. If you run long, drop the A+ click (1:32–1:44) first.
 

@@ -12,7 +12,7 @@ The project started from a 4-minute Spanish voice memo by a former hospital nurs
 |---|---|---|---|
 | Who it helps | Every resident with a plan (3.2M people; 1.4M on Plan Vital; 771K aged 65+) | Nurses in one hospital per sale | Patients of one lab network |
 | Time to launch | Weeks, on WhatsApp | Hospital procurement + EHR integration | One operator partnership |
-| Who pays | Health plans (federal 90-day directory rule) | Hospital IT budget | The lab operator |
-| Patient records needed | None | Full records | Scheduling data |
+| Who pays | Health plans (federal directory-accuracy rules) | Hospital IT budget | The lab operator |
+| Patient data needed | None from patients (plans share only de-identified provider–plan pairs) | Full patient records | Patient scheduling data |
 
 Problems 2 and 3 are on the roadmap for the same platform.
