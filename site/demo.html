@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>¿Coge Mi Plan? · 2-minute demo</title>
+  <meta name="description" content="2-minute demo of ¿Coge Mi Plan? (Takes My Plan?), Puerto Rico's verified registry of which specialists actually accept your health plan." />
+  <meta property="og:title" content="¿Coge Mi Plan? · 2-minute demo" />
+  <meta property="og:description" content="Who actually accepts your health plan in Puerto Rico. Verified." />
+  <meta property="og:image" content="https://coge-mi-plan.netlify.app/demo-poster.jpg" />
+  <meta property="og:video" content="https://coge-mi-plan.netlify.app/demo.mp4" />
+  <meta property="og:type" content="video.other" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; background: #000; color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, Inter, sans-serif; }
+    main { max-width: 1200px; margin: 0 auto; padding: 48px 24px 64px; }
+    .eb { color: #2997ff; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; font-size: 13px; }
+    h1 { font-size: clamp(36px, 6vw, 64px); font-weight: 800; letter-spacing: -.03em; margin: 10px 0 6px; }
+    p.sub { color: #a1a1a6; font-size: 19px; margin: 0 0 28px; }
+    video { width: 100%; aspect-ratio: 16 / 9; border-radius: 18px; background: #111; box-shadow: 0 30px 80px -30px rgba(41,151,255,.35); display: block; }
+    .links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+    .links a { color: #fff; background: #0071e3; text-decoration: none; padding: 12px 20px; border-radius: 999px; font-weight: 600; font-size: 15px; }
+    .links a.ghost { background: #1d1d1f; }
+    footer { color: #6e6e73; font-size: 13px; margin-top: 28px; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eb">Caribbean AI Summit · Healthcare Hackathon</div>
+    <h1>¿Coge Mi Plan? <span style="color:#a1a1a6">Takes My Plan?</span></h1>
+    <p class="sub">2-minute demo · Jay Awal</p>
+    <video controls playsinline preload="metadata" poster="demo-poster.jpg">
+      <source src="demo.mp4" type="video/mp4" />
+    </video>
+    <div class="links">
+      <a href="/">Try the live app</a>
+      <a class="ghost" href="https://github.com/awalempr/coge-mi-plan">Code on GitHub</a>
+      <a class="ghost" href="demo.mp4" download>Download MP4</a>
+    </div>
+    <footer>Prototype using 100% synthetic data. Narration by Jay Awal (ElevenLabs voice).</footer>
+  </main>
+</body>
+</html>
