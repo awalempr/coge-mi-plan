@@ -35,8 +35,8 @@ function answer(ctx, es) {
   const sp = specById(ctx.specialty), pl = planById(ctx.plan), tw = townById(ctx.town);
   const doc = sp.doc[es ? "es" : "en"];
   const head = es
-    ? `De ${r.listed.length} ${doc}s que el directorio de ${pl.name} lista cerca de ${tw.name}, ${r.confirmed.length} están confirmados hoy. ${r.ghost.length} ya no lo aceptan.`
-    : `Of ${r.listed.length} ${doc}s the ${pl.name} directory lists near ${tw.name}, ${r.confirmed.length} are confirmed today. ${r.ghost.length} no longer accept it.`;
+    ? `De ${r.listed.length} ${doc}s que el directorio de ${pl.name} lista cerca de ${tw.name}, ${r.confirmed.length} ${r.confirmed.length === 1 ? "está confirmado" : "están confirmados"} hoy. ${r.ghost.length} ya no lo aceptan.`
+    : `Of ${r.listed.length} ${doc}s the ${pl.name} directory lists near ${tw.name}, ${r.confirmed.length} ${r.confirmed.length === 1 ? "is" : "are"} confirmed today. ${r.ghost.length} no longer accept it.`;
   const rows = r.confirmed.slice(0, 3).map(({ p, d }) => {
     const v = p.plans[ctx.plan].verifiedDaysAgo;
     return `✅ ${p.name} · ${townById(p.town).name} (${Math.round(d)} km) · ${p.phone} · ${es ? "verificado" : "verified"} ${v === 0 ? (es ? "hoy" : "today") : es ? `hace ${v} días` : `${v} days ago`}`;

@@ -112,8 +112,8 @@ function botReply(q, r) {
   const doc = sp.doc[state.lang];
   const L = state.lang === "es";
   const head = L
-    ? `De <b>${r.listed.length}</b> ${doc}s que el directorio de <b>${pl.name}</b> lista cerca de ${tw.name}, <b>${r.confirmed.length}</b> están confirmados aceptándolo hoy. <b>${r.ghost.length}</b> ya no lo aceptan — te ahorré esas llamadas.`
-    : `Of <b>${r.listed.length}</b> ${doc}s the <b>${pl.name}</b> directory lists near ${tw.name}, <b>${r.confirmed.length}</b> are confirmed accepting it today. <b>${r.ghost.length}</b> no longer take it — I saved you those calls.`;
+    ? `De <b>${r.listed.length}</b> ${doc}s que el directorio de <b>${pl.name}</b> lista cerca de ${tw.name}, <b>${r.confirmed.length}</b> ${r.confirmed.length === 1 ? "está confirmado" : "están confirmados"} aceptándolo hoy. <b>${r.ghost.length}</b> ya no lo aceptan — te ahorré esas llamadas.`
+    : `Of <b>${r.listed.length}</b> ${doc}s the <b>${pl.name}</b> directory lists near ${tw.name}, <b>${r.confirmed.length}</b> ${r.confirmed.length === 1 ? "is" : "are"} confirmed accepting it today. <b>${r.ghost.length}</b> no longer take it — I saved you those calls.`;
   const cards = r.confirmed.slice(0, 3).map((x) => card(x, q.plan, "confirmed")).join("")
     + r.unverified.slice(0, 2).map((x) => card(x, q.plan, "unverified")).join("");
   const none = r.confirmed.length === 0
@@ -200,14 +200,14 @@ function startChoice(kind) {
   addMsg("bot", pre + missingPrompt(state.ctx));
 }
 
-async function handleUser(text, { voice = false } = {}) {
+async function handleUser(text, { voice = false, exact = false } = {}) {
   if (!text.trim() || state.busy) return;
   const safe = text.replace(/</g, "&lt;");
   addMsg("user", voice
     ? `<div class="vn">🎤 <span class="wave"></span> 0:0${Math.min(9, 2 + Math.round(text.length / 14))}</div><div class="vn-t">“${safe}”</div>`
     : safe);
   const typing = addMsg("bot", `<span class="typing"><i></i><i></i><i></i></span>`);
-  const ai = await understandRemote(text, state.ctx);
+  const ai = exact ? null : await understandRemote(text, state.ctx); // chip taps are already exact values
   typing.remove();
   if (ai) {
     state.ctx = { ...state.ctx, ...pick(ai) };
@@ -219,12 +219,12 @@ async function handleUser(text, { voice = false } = {}) {
     }
   } else {
     state.ctx = { ...state.ctx, ...parseQuery(text) };
-    state.source = "local";
+    if (!exact) state.source = "local";
     await sleep(350);
   }
   renderIntent(state.ctx);
   const q = state.ctx;
-  if (!q.specialty || !q.plan || !q.town) { addMsg("bot", missingPrompt(q)); return; }
+  if (!q.specialty || !q.plan || !q.town) { addMsg("bot", (ai?.note ? `<p>${ai.note.replace(/</g, "&lt;")}</p>` : "") + missingPrompt(q)); return; }
   const r = search(q);
   state.last = { q, r };
   state.avoided += r.ghost.length;
@@ -420,9 +420,9 @@ async function guidedDemo() {
   }
   await caption("Ahora un adulto mayor en Yauco necesita un psiquiatra. Toca, no escribe.", "Now an older adult in Yauco needs a psychiatrist. He taps — no typing.", 3000);
   startChoice("help"); await sleep(900);
-  await handleUser(cap(spec("psiq").doc[state.lang])); await sleep(700);
-  await handleUser("Plan Vital"); await sleep(700);
-  await handleUser("Yauco"); await sleep(1600);
+  await handleUser(cap(spec("psiq").doc[state.lang]), { exact: true }); await sleep(700);
+  await handleUser("Plan Vital", { exact: true }); await sleep(700);
+  await handleUser("Yauco", { exact: true }); await sleep(1600);
   await caption("Nadie lo acepta. En vez de un callejón sin salida: telemedicina, una carta al plan y el Procurador del Paciente.", "Nobody accepts it. Instead of a dead end: telehealth, a letter to the plan and the Patient Advocate.", 5000);
   setTab("pharmacy");
   await caption("En la farmacia de la comunidad, el farmacéutico contesta “¿quién coge mi plan?” en segundos.", "At the community pharmacy, the pharmacist answers “who takes my plan?” in seconds.", 4200);
@@ -603,7 +603,7 @@ function init() {
     const c = e.target.closest("[data-call]"); if (c) return callForMe(+c.dataset.call);
     const r = e.target.closest("[data-report]"); if (r) return reportWrong(+r.dataset.report);
     const a = e.target.closest("[data-act]"); if (a) return chatAction(a.dataset.act);
-    const s = e.target.closest("[data-say]"); if (s) return handleUser(s.dataset.say);
+    const s = e.target.closest("[data-say]"); if (s) return handleUser(s.dataset.say, { exact: true });
     const st = e.target.closest("[data-start]"); if (st) return startChoice(st.dataset.start);
     const d = e.target.closest("[data-dial]"); if (d) {
       const p = byId.get(+d.dataset.dial);
