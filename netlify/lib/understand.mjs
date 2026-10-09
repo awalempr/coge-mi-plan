@@ -2,7 +2,7 @@
 // Claude fills the slots; the deterministic parser in core.js is the fallback whenever Claude is unavailable.
 import Anthropic from "@anthropic-ai/sdk";
 import { PLANS, SPECIALTIES, TOWNS } from "../../site/data.js";
-import { parseQuery } from "../../site/core.js";
+import { parseQuery, looksUrgent } from "../../site/core.js";
 
 const MODEL = "claude-opus-5-5";
 const MAX_INPUT_CHARS = 600;
@@ -44,7 +44,7 @@ export function aiEnabled() {
 
 export async function understand(text, known = {}) {
   const clean = String(text || "").slice(0, MAX_INPUT_CHARS);
-  const fallback = () => ({ ...known, ...parseQuery(clean), source: "local", urgent: false, note: "" });
+  const fallback = () => ({ ...known, ...parseQuery(clean), source: "local", urgent: looksUrgent(clean), note: "" });
   if (!aiEnabled() || !clean.trim()) return fallback();
 
   client ??= new Anthropic({ timeout: 15_000, maxRetries: 1 });
@@ -67,7 +67,7 @@ export async function understand(text, known = {}) {
     const out = JSON.parse(textBlock.text);
     const merged = { ...known };
     for (const k of ["specialty", "plan", "town"]) if (out[k] && out[k] !== "unknown") merged[k] = out[k];
-    return { ...merged, language: out.language, urgent: Boolean(out.urgent), note: out.note || "", source: "claude" };
+    return { ...merged, language: out.language, urgent: Boolean(out.urgent) || looksUrgent(clean), note: out.note || "", source: "claude" };
   } catch (error) {
     if (error instanceof Anthropic.RateLimitError) console.warn("understand: rate limited, using local parser");
     else if (error instanceof Anthropic.APIError) console.error(`understand: API error ${error.status}`);

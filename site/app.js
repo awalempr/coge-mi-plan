@@ -1,5 +1,5 @@
 import { PLANS, SPECIALTIES, TOWNS, REGIONS, buildProviders, dateFromDays } from "./data.js";
-import { parseQuery, makeSearch, km } from "./core.js";
+import { parseQuery, makeSearch, km, looksUrgent, urgentMessage } from "./core.js";
 
 const providers = buildProviders();
 const byId = new Map(providers.map((p) => [p.id, p]));
@@ -206,6 +206,10 @@ async function handleUser(text, { voice = false, exact = false } = {}) {
   addMsg("user", voice
     ? `<div class="vn">🎤 <span class="wave"></span> 0:0${Math.min(9, 2 + Math.round(text.length / 14))}</div><div class="vn-t">“${safe}”</div>`
     : safe);
+  if (!exact && looksUrgent(text)) {
+    addMsg("bot", `<p class="urgent">🚨 ${urgentMessage(text, state.lang)}</p>`);
+    return;
+  }
   const typing = addMsg("bot", `<span class="typing"><i></i><i></i><i></i></span>`);
   const ai = exact ? null : await understandRemote(text, state.ctx); // chip taps are already exact values
   typing.remove();
@@ -241,13 +245,11 @@ const pick = (o) => Object.fromEntries(["specialty", "plan", "town"].filter((k) 
 async function understandRemote(text, known) {
   if (state.aiOff) return null;
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 9000);
+  const timer = setTimeout(() => ctrl.abort(), 12000);
   try {
     const res = await fetch("/api/understand", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, known: pick(known) }), signal: ctrl.signal });
     if (!res.ok) { if (res.status === 404 || res.status === 405 || res.status === 501) state.aiOff = true; return null; }
-    const out = await res.json();
-    if (out.source !== "claude") state.aiOff = true; // no API key configured: stay local
-    return out;
+    return await res.json(); // a one-off local fallback (slow call, rate limit) doesn't disable Claude for later messages
   } catch {
     return null;
   } finally {
@@ -623,5 +625,6 @@ function init() {
   applyLang();
   welcome();
   renderStats();
+  fetch("/api/understand").then((r) => (r.ok ? r.json() : { ai: false })).then((s) => { if (!s.ai) state.aiOff = true; }).catch(() => { state.aiOff = true; });
 }
 init();

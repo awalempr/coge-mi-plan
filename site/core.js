@@ -45,3 +45,22 @@ export function makeSearch(providers) {
     return { listed, ...groups };
   };
 }
+
+// On-device emergency screen. Runs before (and independent of) the AI layer, so 911/988 guidance
+// appears even when Claude is unreachable. Deliberately broad: a false alarm costs one sentence.
+const URGENT = [
+  /dolor (fuerte )?(en el |de )?pecho/, /no puedo respirar/, /me falta el aire/, /me ahogo/, /chest pain/, /can'?t breathe/, /short(ness)? of breath/,
+  /derrame/, /stroke/, /cara (caida|torcida)/, /sangr(o|ando) mucho/, /bleeding (a lot|heavily)/, /desmay/, /fainted/, /convulsi/, /seizure (now|right now)/,
+  /suicid/, /quitar(me|se)? la vida/, /matar(me|se)/, /(me|se) (quiere|quiero) matar/, /no (quiero|quiere) vivir/, /kill (my|him|her|them)sel(f|ves)/, /end (my|his|her|their) li(fe|ves)/, /overdos/, /sobredosis/,
+];
+export function looksUrgent(text) {
+  const n = norm(text);
+  return URGENT.some((rx) => rx.test(n));
+}
+export function urgentMessage(text, lang) {
+  const n = norm(text);
+  const mental = /suicid|quitar(me|se)? la vida|matar(me|se)|(me|se) (quiere|quiero) matar|no (quiero|quiere) vivir|kill (my|him|her|them)sel(f|ves)|end (my|his|her|their) li(fe|ves)/.test(n);
+  return lang === "es"
+    ? `Esto puede ser una emergencia. Llama al <b>911</b> ahora.${mental ? " Si estás pensando en hacerte daño, llama o textea al <b>988</b> (Línea PAS de ASSMCA: 1-800-981-0023)." : ""}`
+    : `This may be an emergency. Call <b>911</b> now.${mental ? " If you are thinking about harming yourself, call or text <b>988</b>." : ""}`;
+}
