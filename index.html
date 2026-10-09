@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Coge Mi Plan · ¿Quién de verdad acepta tu plan médico?</title>
+  <meta name="description" content="Bilingual assistant that tells patients in Puerto Rico which specialists actually accept their health plan today, verified by AI calls." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="logo">✓</div>
+      <div>
+        <h1>¿Coge Mi Plan?</h1>
+        <p data-t="tagline"></p>
+      </div>
+    </div>
+    <nav>
+      <button class="tab on" data-tab="patient">1 · <span data-t="tabPatient"></span></button>
+      <button class="tab" data-tab="verify">2 · <span data-t="tabVerify"></span></button>
+      <button class="tab" data-tab="impact">3 · <span data-t="tabImpact"></span></button>
+      <button id="lang" class="langbtn">EN</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 1. Patient -->
+    <section id="view-patient" class="view">
+      <div class="phone">
+        <div class="phone-head">
+          <div class="avatar">✓</div>
+          <div><b data-t="chatTitle"></b><div class="small" data-t="chatSub"></div></div>
+        </div>
+        <div id="chat" class="chat"></div>
+        <div id="suggest" class="suggest"></div>
+        <form id="composer" class="composer">
+          <input id="msg" autocomplete="off" />
+          <button type="submit" aria-label="send">➤</button>
+        </form>
+      </div>
+
+      <div class="side">
+        <div class="panel">
+          <h3 data-t="behind"></h3>
+          <div class="label" data-t="understood"></div>
+          <div id="intent" class="chips"></div>
+          <div class="label" data-t="funnel"></div>
+          <div id="funnel" class="funnel"><p class="muted small">—</p></div>
+          <div class="stats">
+            <div><span id="stat-calls">0</span><small data-t="statsCalls"></small></div>
+            <div><span id="stat-avoided">0</span><small data-t="statsAvoided"></small></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3 data-t="callLog"></h3>
+          <div id="calllog" class="calllog"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Verification -->
+    <section id="view-verify" class="view" hidden>
+      <div class="panel wide">
+        <div class="vhead">
+          <div>
+            <h2 data-t="vTitle"></h2>
+            <p class="muted" data-t="vSub"></p>
+          </div>
+          <button id="v-run" class="cta" data-t="vRun"></button>
+        </div>
+        <div class="kpis">
+          <div><span id="v-compliance">0%</span><small data-t="vCompliance"></small></div>
+          <div><span id="v-queue">0</span><small data-t="vQueue"></small></div>
+          <div><span id="v-ghost">0</span><small data-t="vGhost"></small></div>
+        </div>
+        <div class="vgrid">
+          <table id="vtable">
+            <thead><tr><th data-t="colProvider"></th><th data-t="colPlan"></th><th data-t="colLast"></th><th data-t="colDemand"></th><th data-t="colResult"></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div id="vlog" class="calllog tall"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Impact -->
+    <section id="view-impact" class="view" hidden>
+      <div class="panel wide">
+        <div class="vhead">
+          <div>
+            <h2 data-t="iTitle"></h2>
+            <p class="muted" data-t="iSub"></p>
+          </div>
+          <label class="sel"><span data-t="iPlan"></span> <select id="i-plan"></select></label>
+        </div>
+        <div class="kpis">
+          <div><span id="k1">0</span><small data-t="iK1"></small></div>
+          <div><span id="k2" class="bad">0</span><small data-t="iK2"></small></div>
+          <div><span id="k3" class="bad">0</span><small data-t="iK3"></small></div>
+        </div>
+        <div class="igrid">
+          <table id="heat" class="heat"></table>
+          <div>
+            <h3 data-t="iGhost"></h3>
+            <p class="muted small" data-t="iGhostSub"></p>
+            <div id="ghostbars" class="funnel"></div>
+            <button id="i-export" class="cta ghost" data-t="iExport"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><span data-t="disclaimer"></span></footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
