@@ -21,8 +21,9 @@
     </div>
     <nav>
       <button class="tab on" data-tab="patient">1 · <span data-t="tabPatient"></span></button>
-      <button class="tab" data-tab="verify">2 · <span data-t="tabVerify"></span></button>
-      <button class="tab" data-tab="impact">3 · <span data-t="tabImpact"></span></button>
+      <button class="tab" data-tab="pharmacy">2 · <span data-t="tabPharmacy"></span></button>
+      <button class="tab" data-tab="verify">3 · <span data-t="tabVerify"></span></button>
+      <button class="tab" data-tab="impact">4 · <span data-t="tabImpact"></span></button>
       <button id="lang" class="langbtn">EN</button>
     </nav>
   </header>
@@ -62,7 +63,25 @@
       </div>
     </section>
 
-    <!-- 2. Verification -->
+    <!-- 2. Pharmacy counter -->
+    <section id="view-pharmacy" class="view" hidden>
+      <div class="panel wide">
+        <div>
+          <h2 data-t="phTitle"></h2>
+          <p class="muted" data-t="phSub"></p>
+        </div>
+        <div class="phform">
+          <label class="sel"><span data-t="phSpec"></span><select id="ph-spec"></select></label>
+          <label class="sel"><span data-t="phPlan"></span><select id="ph-plan"></select></label>
+          <label class="sel"><span data-t="phTown"></span><select id="ph-town"></select></label>
+          <button id="ph-copy" class="cta" data-t="phCopy"></button>
+        </div>
+        <p id="ph-summary"></p>
+        <div id="ph-results"></div>
+      </div>
+    </section>
+
+    <!-- 3. Verification -->
     <section id="view-verify" class="view" hidden>
       <div class="panel wide">
         <div class="vhead">

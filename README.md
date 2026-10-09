@@ -2,12 +2,19 @@
 
 **Caribbean AI Summit Healthcare Hackathon 2026 · Track: Access to care**
 
-In Puerto Rico, finding a specialist who accepts your *plan médico* means calling office after office, because plan directories are full of "ghost" listings: doctors who dropped the plan, went cash-only, or aren't taking new patients. **¿Coge Mi Plan?** is a bilingual (ES/EN) chat assistant that tells patients which specialists are *verified* to accept their plan today. When a listing is stale, an AI voice agent calls the office for them, and every answer updates the directory for everyone.
+In Puerto Rico, finding a specialist who accepts your *plan médico* means calling office after office, because plan directories are full of "ghost" listings: doctors who dropped the plan, went cash-only, or aren't taking new patients. **¿Coge Mi Plan?** is a **central, verified registry of who accepts which plan across the island**. Patients, pharmacies, plans and regulators all read from the same source of truth.
+
+Each listing is verified with the best evidence available:
+1. **Paid claims** from plans (a plan paid Dr. X for a Plan Vital visit in the last 60 days, so Dr. X accepts Plan Vital)
+2. **Office confirmation**: one tap on WhatsApp each month
+3. **Patient and pharmacy reports** ("they turned me away")
+4. **AI voice call** as a fallback, only when nothing recent exists
 
 ## What the prototype shows
-1. **Patient:** natural-language request in Spanish or English ("dermatólogo que coja Plan Vital en Caguas"). Returns verified results ranked by distance and wait, how many listings are ghosts, and a **"Llamar por mí"** button that runs an AI verification call.
-2. **Verification:** queue of listings not verified in 90+ days, ranked by patient demand. One click runs a round of AI calls and shows the effect on 90-day compliance (No Surprises Act §116).
-3. **Impact:** a "real access" heatmap (specialty × region) and ghost-listing rates by plan, with a CSV export for regulators (OCS / ASES) and plans.
+1. **Patient:** a bilingual (ES/EN) chat. "Dermatólogo que coja Plan Vital en Caguas" returns verified specialists with the verification date, source and next opening, plus how many listings are ghosts. "Llamar por mí" runs the AI fallback call.
+2. **Pharmacy:** a counter mode for community pharmacies. The pharmacist answers "¿quién coge mi plan?" in seconds, copies the list for the patient's WhatsApp, and reports turn-aways with one tap.
+3. **Verification:** the registry's verification-source mix and 90-day compliance (No Surprises Act §116), plus the queue of stale listings ranked by patient demand.
+4. **Impact:** a "real access" heatmap (specialty × region, red = specialist desert) and ghost-listing rates by plan, with a CSV export for regulators (OCS / ASES) and plans.
 
 ## Run it
 No build step. Any static server works:

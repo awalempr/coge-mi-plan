@@ -12,7 +12,8 @@ const state = { lang: "es", tab: "patient", ctx: {}, calls: 0, avoided: 0, busy:
 const T = {
   es: {
     tagline: "El registro central y verificado de quién acepta qué plan en Puerto Rico.",
-    tabPatient: "Paciente", tabVerify: "Verificación", tabImpact: "Impacto",
+    tabPatient: "Paciente", tabPharmacy: "Farmacia", tabVerify: "Verificación", tabImpact: "Impacto",
+    phTitle: "Modo farmacia", phSub: "En el mostrador, el cliente pregunta: “¿quién coge mi plan?”. El farmacéutico responde en segundos y le envía la lista al paciente. Si un médico rechazó al paciente, se reporta con un toque.", phSpec: "Especialidad", phPlan: "Plan", phTown: "Pueblo", phSearch: "Buscar", phCopy: "Copiar lista para WhatsApp del paciente", phCopied: "¡Copiado!", phReport: "Rechazó al paciente", phReported: "Reportado ✓", phNone: "Ningún especialista confirmado en 45 km. Este dato alimenta el mapa de desiertos.", phStatus: "Estado",
     chatTitle: "Coge Mi Plan", chatSub: "Asistente · responde en segundos",
     placeholder: "Ej: dermatólogo que coja Plan Vital en Caguas",
     send: "Enviar",
@@ -36,7 +37,8 @@ const T = {
   },
   en: {
     tagline: "Puerto Rico's central, verified registry of who accepts which plan.",
-    tabPatient: "Patient", tabVerify: "Verification", tabImpact: "Impact",
+    tabPatient: "Patient", tabPharmacy: "Pharmacy", tabVerify: "Verification", tabImpact: "Impact",
+    phTitle: "Pharmacy mode", phSub: "At the counter, the customer asks: “who takes my plan?”. The pharmacist answers in seconds and sends the list to the patient. If a doctor turned the patient away, it is reported with one tap.", phSpec: "Specialty", phPlan: "Plan", phTown: "Town", phSearch: "Search", phCopy: "Copy list for patient's WhatsApp", phCopied: "Copied!", phReport: "Turned patient away", phReported: "Reported ✓", phNone: "No confirmed specialist within 45 km. This feeds the desert map.", phStatus: "Status",
     chatTitle: "Coge Mi Plan", chatSub: "Assistant · replies in seconds",
     placeholder: "e.g. dermatologist that takes Plan Vital in Caguas",
     send: "Send",
@@ -284,6 +286,28 @@ function reportWrong(id) {
     : `Thanks for letting us know. <b>${p.name}</b> is now first in the verification queue; the AI will re-confirm today. Your report is anonymous.`);
 }
 
+// ---------- pharmacy counter ----------
+function renderPharmacy() {
+  const r = search({ specialty: $("#ph-spec").value, plan: $("#ph-plan").value, town: $("#ph-town").value });
+  state.ph = r;
+  const rows = r.confirmed.map(({ p, d }) => {
+    const s = p.plans[$("#ph-plan").value];
+    return `<tr><td><b>${p.name}</b><div class="muted small">${town(p.town).name} · ${Math.round(d)} km</div></td><td>${p.phone}</td><td>${fmtDate(p.nextDays)}</td>
+      <td><span class="badge ok">✓ ${t("daysAgo")(s.verifiedDaysAgo)}</span></td><td><button class="link" data-phreport="${p.id}">${t("phReport")}</button></td></tr>`;
+  }).join("");
+  $("#ph-results").innerHTML = r.confirmed.length
+    ? `<table><thead><tr><th>${t("colProvider")}</th><th>Tel.</th><th>${t("nextAppt")}</th><th>${t("verified")}</th><th></th></tr></thead><tbody>${rows}</tbody></table>`
+    : `<p class="muted">${t("phNone")}</p>`;
+  $("#ph-summary").innerHTML = `<b>${r.listed.length}</b> ${t("listed").toLowerCase()} · <b class="okc">${r.confirmed.length}</b> ${t("confirmed").toLowerCase()} · <b class="bad">${r.ghost.length}</b> ${t("ghost").toLowerCase()}`;
+}
+function copyPharmacy() {
+  const pl = plan($("#ph-plan").value).name, sp = spec($("#ph-spec").value)[state.lang];
+  const lines = state.ph.confirmed.slice(0, 5).map(({ p }) => `• ${p.name} — ${p.phone} — ${town(p.town).name}`);
+  const txt = `${sp} · ${pl}\n${lines.join("\n")}\n— Coge Mi Plan`;
+  navigator.clipboard?.writeText(txt).catch(() => {});
+  const b = $("#ph-copy"); b.textContent = t("phCopied"); setTimeout(() => (b.textContent = t("phCopy")), 1500);
+}
+
 // ---------- verification tab ----------
 function demand(p, planId) { return ((p.id * 37 + planId.length * 11) % 90) + 10; }
 function queueRows() {
@@ -395,6 +419,12 @@ function applyLang() {
   $("#msg").placeholder = t("placeholder");
   $("#suggest").innerHTML = t("suggestions").map((s) => `<button class="sugg">${s}</button>`).join("");
   $("#lang").textContent = state.lang === "es" ? "EN" : "ES";
+  const keep = ["ph-spec", "ph-plan", "ph-town"].map((id) => $("#" + id).value);
+  $("#ph-spec").innerHTML = SPECIALTIES.map((s) => `<option value="${s.id}">${s[state.lang]}</option>`).join("");
+  $("#ph-plan").innerHTML = PLANS.map((p) => `<option value="${p.id}">${p.name}</option>`).join("");
+  $("#ph-town").innerHTML = TOWNS.map((tw) => `<option value="${tw.id}">${tw.name}</option>`).join("");
+  ["ph-spec", "ph-plan", "ph-town"].forEach((id, i) => ($("#" + id).value = keep[i] || { "ph-spec": "derm", "ph-plan": "vital", "ph-town": "caguas" }[id]));
+  renderPharmacy();
   $("#i-plan").innerHTML = PLANS.map((p) => `<option value="${p.id}">${p.name} · ${p.kind}</option>`).join("");
   if (!$("#calllog").children.length || $("#calllog .idle")) $("#calllog").innerHTML = `<p class="idle muted">${t("callIdle")}</p>`;
   renderIntent(state.ctx);
@@ -406,6 +436,8 @@ function setTab(tab) {
   document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("on", b.dataset.tab === tab));
   document.querySelectorAll(".view").forEach((v) => (v.hidden = v.id !== `view-${tab}`));
   if (tab === "impact") renderImpact();
+  if (tab === "pharmacy") renderPharmacy();
+  if (tab === "verify") renderVerify();
 }
 
 function init() {
@@ -418,6 +450,13 @@ function init() {
     const r = e.target.closest("[data-report]"); if (r) return reportWrong(+r.dataset.report);
   });
   $("#v-run").addEventListener("click", runRound);
+  ["ph-spec", "ph-plan", "ph-town"].forEach((id) => $("#" + id).addEventListener("change", renderPharmacy));
+  $("#ph-copy").addEventListener("click", copyPharmacy);
+  $("#ph-results").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-phreport]"); if (!b) return;
+    Object.assign(byId.get(+b.dataset.phreport).plans[$("#ph-plan").value], { verifiedDaysAgo: 120, source: "patient_report" });
+    b.replaceWith(el(`<span class="badge warn">${t("phReported")}</span>`));
+  });
   $("#i-plan").addEventListener("change", renderImpact);
   $("#i-export").addEventListener("click", exportCsv);
   applyLang();
