@@ -2,7 +2,7 @@
 
 <p align="center"><img src="docs/images/hero.jpg" alt="Coge Mi Plan: of 14 dermatologists the Plan Vital directory lists near Caguas, 1 is confirmed and 8 are ghosts" width="900"></p>
 
-<p align="center"><b><a href="https://coge-mi-plan.netlify.app">Live demo</a></b> · <b><a href="https://coge-mi-plan.netlify.app/demo">2-minute video</a></b> · <a href="docs/pitch-script.md">Pitch script</a> · <a href="docs/pitch-script-es.md">Guion en español</a> · <a href="docs/devpost-submission.md">Project story</a></p>
+<p align="center"><b><a href="https://coge-mi-plan.netlify.app">Live demo</a></b> · <a href="docs/pitch-script.md">Pitch script</a> · <a href="docs/pitch-script-es.md">Guion en español</a> · <a href="docs/devpost-submission.md">Project story</a></p>
 
 **Caribbean AI Summit Healthcare Hackathon 2026 · Track: Access to care**
 
