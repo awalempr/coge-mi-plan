@@ -5,6 +5,7 @@ Five slides that follow a sales arc: hook → why this problem → product → a
 ## Script
 
 **Slide 1: hook + problem (0:00–0:35)**
+*(Optional opener: "I'm Jay Awal, and I built this solo.")*
 "Yo no sé cuántos dermatólogos llamé. Ninguno coge plan médico. Ninguno."
 A former hospital nurse here in Puerto Rico said that in a voice memo. Everyone in this room has lived it: you call office after office, and nobody takes your plan.
 This isn't bad luck, it's bad data. About half of Medicare Advantage directory listings have errors. In April, investigative reporters found half the specialists they sampled took no First Medical coverage at all. And we've lost more than 8,000 physicians. Plans pay late and pay little, doctors drop the plans, and the directories never catch up.
@@ -19,7 +20,7 @@ The memo named three problems: specialists who don't take your plan, nurses trac
 Patients use it free. Plans are the buyer: federal law already requires them to verify directories every 90 days, and we do it once for all of them. CUD's pharmacies are the front door, because that's where people already ask "¿quién coge mi plan?". Regulators get evidence on the real cause. No patient records are stored. The demo runs on synthetic data, and the claims feed needs plan agreements, which is what the pilot tests.
 
 **Slide 5: pilot + ask (2:35–3:00)**
-Ninety days in Caguas: three specialties, two plans, ten CUD pharmacies. We'll measure ghost rate, days to first appointment, and calls saved. Our ask: fund the pilot, and introduce us to ten pharmacies and one plan partner. Antes de llamar, pregúntale a Coge Mi Plan.
+Ninety days in Caguas: three specialties, two plans, ten CUD pharmacies. We'll measure ghost rate, days to first appointment, and calls saved. Our ask: fund the pilot, and introduce me to ten pharmacies and one plan partner. Antes de llamar, pregúntale a Coge Mi Plan.
 
 ## Likely questions, by judge profile
 
