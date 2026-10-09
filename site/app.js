@@ -242,14 +242,16 @@ const pick = (o) => Object.fromEntries(["specialty", "plan", "town"].filter((k) 
 
 // Claude reads the message server-side (/api/understand). If the endpoint is missing, slow or down,
 // the deterministic parser takes over so the experience never breaks.
-async function understandRemote(text, known) {
+async function understandRemote(text, known, retried = false) {
   if (state.aiOff) return null;
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 12000);
   try {
     const res = await fetch("/api/understand", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, known: pick(known) }), signal: ctrl.signal });
     if (!res.ok) { if (res.status === 404 || res.status === 405 || res.status === 501) state.aiOff = true; return null; }
-    return await res.json(); // a one-off local fallback (slow call, rate limit) doesn't disable Claude for later messages
+    const out = await res.json(); // a one-off local fallback (slow call, rate limit) doesn't disable Claude for later messages
+    if (out.source === "local" && !retried && res.status === 200) return understandRemote(text, known, true); // cold start: try once more
+    return out;
   } catch {
     return null;
   } finally {
@@ -625,5 +627,6 @@ function init() {
   applyLang();
   welcome();
   renderStats();
+  fetch("/api/understand", { cache: "no-store" }).catch(() => {}); // wake the function before the first message
 }
 init();
