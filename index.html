@@ -5,45 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Coge Mi Plan · Registro verificado de planes médicos</title>
   <meta name="description" content="Bilingual assistant that tells patients in Puerto Rico which specialists actually accept their health plan today, verified by AI calls." />
+  <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 </head>
 <body>
   <header class="top">
-    <div class="brand">
-      <div class="logo">✓</div>
-      <div>
-        <h1>¿Coge Mi Plan?</h1>
-        <p data-t="tagline"></p>
+    <div class="top-inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="brand-name">Coge Mi Plan</span>
+      </div>
+      <nav class="seg" role="tablist">
+        <button class="tab on" data-tab="patient" role="tab"><span data-t="tabPatient"></span></button>
+        <button class="tab" data-tab="pharmacy" role="tab"><span data-t="tabPharmacy"></span></button>
+        <button class="tab" data-tab="verify" role="tab"><span data-t="tabVerify"></span></button>
+        <button class="tab" data-tab="impact" role="tab"><span data-t="tabImpact"></span></button>
+      </nav>
+      <div class="tools">
+        <button id="bigtext" class="iconbtn" aria-label="Text size" title="Text size">A<sup>+</sup></button>
+        <button id="lang" class="iconbtn" aria-label="Language">EN</button>
+        <button id="demo" class="demobtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg><span>Demo</span></button>
       </div>
     </div>
-    <nav>
-      <button class="tab on" data-tab="patient">1 · <span data-t="tabPatient"></span></button>
-      <button class="tab" data-tab="pharmacy">2 · <span data-t="tabPharmacy"></span></button>
-      <button class="tab" data-tab="verify">3 · <span data-t="tabVerify"></span></button>
-      <button class="tab" data-tab="impact">4 · <span data-t="tabImpact"></span></button>
-      <button id="demo" class="demobtn">▶ Demo</button>
-      <button id="bigtext" class="langbtn" aria-label="large text">A+</button>
-      <button id="lang" class="langbtn">EN</button>
-    </nav>
   </header>
+
+  <section class="hero">
+    <h1>¿Coge Mi Plan?</h1>
+    <p data-t="tagline"></p>
+  </section>
 
   <main>
     <!-- 1. Patient -->
     <section id="view-patient" class="view">
       <div class="phone">
+        <div class="island" aria-hidden="true"></div>
         <div class="phone-head">
-          <div class="avatar">✓</div>
-          <div><b data-t="chatTitle"></b><div class="small" data-t="chatSub"></div></div>
+          <div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <b data-t="chatTitle"></b>
+          <div class="small" data-t="chatSub"></div>
         </div>
         <div id="chat" class="chat"></div>
         <div id="suggest" class="suggest"></div>
         <form id="composer" class="composer">
-          <button type="button" id="mic" class="mic" aria-label="voice note">🎤</button>
+          <button type="button" id="mic" class="mic" aria-label="Voice note"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
           <input id="msg" autocomplete="off" />
-          <button type="submit" aria-label="send">➤</button>
+          <button type="submit" class="send" aria-label="Send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </form>
       </div>
 
