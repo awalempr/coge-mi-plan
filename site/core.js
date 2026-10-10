@@ -13,6 +13,22 @@ export function km(a, b) {
   return 2 * R * Math.asin(Math.sqrt(x));
 }
 
+// Towns not in the registry map to the nearest listed town (also used by the offline parser).
+const NEARBY = {
+  "toa baja": "bayamon", "toa alta": "bayamon", "dorado": "bayamon", "catano": "bayamon", "naranjito": "bayamon", "corozal": "bayamon", "comerio": "bayamon",
+  "trujillo alto": "carolina", "canovanas": "carolina", "loiza": "carolina", "rio grande": "carolina",
+  "gurabo": "caguas", "juncos": "caguas", "san lorenzo": "caguas", "aguas buenas": "caguas", "cidra": "cayey", "aibonito": "cayey", "barranquitas": "cayey",
+  "juana diaz": "ponce", "santa isabel": "ponce", "villalba": "ponce", "coamo": "ponce", "adjuntas": "ponce", "jayuya": "ponce",
+  "penuelas": "yauco", "guanica": "yauco", "guayanilla": "yauco", "sabana grande": "yauco", "lajas": "yauco",
+  "cabo rojo": "mayaguez", "hormigueros": "mayaguez", "san german": "mayaguez", "anasco": "mayaguez", "maricao": "mayaguez", "las marias": "mayaguez",
+  "isabela": "aguadilla", "moca": "aguadilla", "aguada": "aguadilla", "rincon": "aguadilla", "san sebastian": "aguadilla", "quebradillas": "aguadilla",
+  "hatillo": "arecibo", "camuy": "arecibo", "utuado": "arecibo", "lares": "arecibo",
+  "vega baja": "manati", "vega alta": "manati", "barceloneta": "manati", "ciales": "manati", "florida": "manati", "morovis": "manati", "orocovis": "manati",
+  "yabucoa": "humacao", "naguabo": "humacao", "las piedras": "humacao", "maunabo": "humacao",
+  "luquillo": "fajardo", "ceiba": "fajardo", "vieques": "fajardo", "culebra": "fajardo",
+  "salinas": "guayama", "arroyo": "guayama", "patillas": "guayama",
+};
+
 // Deterministic ES/EN slot parser. It is the offline fallback when the Claude endpoint is unavailable.
 export function parseQuery(text) {
   const n = norm(text);
@@ -23,6 +39,7 @@ export function parseQuery(text) {
   if (p) out.plan = p.id;
   const tw = TOWNS.find((tw) => n.includes(norm(tw.name)));
   if (tw) out.town = tw.id;
+  else { const near = Object.entries(NEARBY).find(([name]) => n.includes(name)); if (near) out.town = near[1]; }
   return out;
 }
 
